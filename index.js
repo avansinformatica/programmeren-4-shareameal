@@ -13,6 +13,7 @@ app.all("*", (req, res, next) => {
   console.log(`Method ${method} is aangeroepen`);
   next();
 });
+//test 123
 
 app.get("/", (req, res) => {
   res.status(200).json({
