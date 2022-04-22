@@ -14,5 +14,11 @@
   },
   "dependencies": {
     "express": "^4.17.3"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": true
   }
 }
