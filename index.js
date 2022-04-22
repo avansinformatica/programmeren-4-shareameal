@@ -5,6 +5,28 @@ const port = process.env.PORT || 3000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
+const FORBIDDEN_TERMINAL_CHARACTERS = [
+  `!`,
+  `#`,
+  `$`,
+  `%`,
+  `&`,
+  `'`,
+  `*`,
+  `+`,
+  `-`,
+  `/`,
+  `=`,
+  `?`,
+  `^`,
+  `_`,
+  "`",
+  `{`,
+  `|`,
+  `}`,
+  `~`,
+];
+
 let database = [];
 let id = 0;
 
@@ -65,18 +87,38 @@ app.get("/api/movie", (req, res, next) => {
 // user functions
 app.post("/api/user", (req, res) => {
   let user = req.body;
-  id++;
-  user = {
-    id,
-    ...user,
-  };
-  console.log(user);
-  database.push(user);
-  res.status(201).json({
-    status: 201,
-    result: database,
-  });
+  if (emailIsValid(user.email)) {
+    id++;
+    user = {
+      id,
+      ...user,
+    };
+    console.log(user);
+    database.push(user);
+    res.status(201).json({
+      status: 201,
+      result: database,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `Email address ${user.email} is not valid`,
+    });
+  }
 });
+
+let emailIsValid = (email) => {
+  let syntaxGood = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!syntaxGood) return false; // skip loop if we've already failed
+
+  for (let badChar of FORBIDDEN_TERMINAL_CHARACTERS) {
+    if (email.startsWith(badChar) || email.endsWith(badChar)) {
+      return false; // terminate early
+    }
+  }
+
+  return true;
+};
 
 app.get("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
