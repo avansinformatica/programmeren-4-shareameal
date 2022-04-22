@@ -21,6 +21,7 @@ app.get("/", (req, res) => {
   });
 });
 
+// movie functions
 app.post("/api/movie", (req, res) => {
   let movie = req.body;
   id++;
@@ -55,6 +56,47 @@ app.get("/api/movie/:movieId", (req, res, next) => {
 });
 
 app.get("/api/movie", (req, res, next) => {
+  res.status(200).json({
+    status: 200,
+    result: database,
+  });
+});
+
+// user functions
+app.post("/api/user", (req, res) => {
+  let user = req.body;
+  id++;
+  user = {
+    id,
+    ...user,
+  };
+  console.log(user);
+  database.push(user);
+  res.status(201).json({
+    status: 201,
+    result: database,
+  });
+});
+
+app.get("/api/user/:userId", (req, res, next) => {
+  const userId = req.params.userId;
+  console.log(`User met ID ${userId} gezocht`);
+  let user = database.filter((item) => item.id == userId);
+  if (user.length > 0) {
+    console.log(user);
+    res.status(200).json({
+      status: 200,
+      result: user,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User with ID ${userId} not found`,
+    });
+  }
+});
+
+app.get("/api/user", (req, res, next) => {
   res.status(200).json({
     status: 200,
     result: database,
