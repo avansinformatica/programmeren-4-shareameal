@@ -107,6 +107,10 @@ app.post("/api/user", (req, res) => {
   }
 });
 
+app.delete("/api/user", (req, res) => {
+  res.send("DELETE Request Called");
+});
+
 let emailIsValid = (email) => {
   let syntaxGood = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   if (!syntaxGood) return false; // skip loop if we've already failed
