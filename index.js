@@ -69,40 +69,36 @@ app.get("/api/movie", (req, res, next) => {
 //Users
 app.post("/api/user", (req, res) => {
   let user = req.body;
-  id++;
-  user = {
-    id,
-    ...user,
-  };
-  console.log(user);
-  database.push(user);
 
-  let validEmail;
+  let validEmail = true;
 
-/*   for (const person in users) {
-    if (users.hasOwnProperty.call(users, person)) {
-      const u = object[person];
-      
-      if (u.getString("emailAdress") == user.getString("emailAdress")) {
-        res.status(401).json({
-          status: 401,
-          result: "Not an unique email",
-        });
+  database.forEach((u) => {
+    if (u.emailAddress === user.emailAddress) {
         validEmail = false;
-      } else {
-        validEmail = true;
-      }
     }
-  } */
+  });
 
-  validEmail = true;
+  if (validEmail) {
 
-  if (validEmail == true) {
+    id++;
+    user = {
+      id,
+      ...user,
+    };
+
+    console.log(user);
+    database.push(user);
+
     res.status(201).json({
       status: 201,
       result: database,
     });
-  }
+  } else {
+    res.status(401).json({
+        status: 401,
+        message: `Email ${user.emailAddress} already in use.`,
+    });
+}
 });
 
 app.get("/api/user", (req, res, next) => {
