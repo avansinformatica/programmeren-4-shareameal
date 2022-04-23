@@ -13,7 +13,7 @@ let userID = 0;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
-  console.log(`Method ${method} is aangeroepen`);
+  console.log(`Method ${method} is called`);
   next();
 });
 
@@ -42,7 +42,7 @@ app.post("/api/movie", (req, res) => {
 
 app.get("/api/movie/:movieId", (req, res, next) => {
   const movieId = req.params.movieId;
-  console.log(`Movie met ID ${movieId} gezocht`);
+  console.log(`Movie with ID ${movieId} searched`);
   let movie = movies.filter((item) => item.movieID == movieId);
   if (movie.length > 0) {
     console.log(movie);
@@ -64,6 +64,7 @@ app.get("/api/movie", (req, res, next) => {
     result: movies,
   });
 });
+
 
 //Users
 app.post("/api/user", (req, res) => {
@@ -125,6 +126,37 @@ app.get("/api/user/:userId", (req, res, next) => {
     res.status(401).json({
       status: 401,
       result: `User with ID ${userId} not found`,
+    });
+  }
+});
+
+app.delete("/api/user/:userId", (req, res, next) => {
+  let userDeleted;
+
+  const userId = req.params.userId;
+  console.log(`User with ID ${userId} found, is being removed`);
+  let user = users.filter((item) => item.userID == userId);
+  console.log(user);
+
+  for (let i = 0; i < users.length; i++) {
+    if (user.userID == users[i].userID) {
+        users.splice(users[i], 1)
+        console.log(users);
+        userDeleted = true;
+    } else {
+        userDeleted = false;
+    }
+  }
+
+  if (userDeleted == true) {
+    res.status(200).json({
+      status: 200,
+      result: `User ${userId} deleted succesfully.`,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User with ID ${userId} not removed`,
     });
   }
 });
