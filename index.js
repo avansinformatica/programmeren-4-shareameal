@@ -85,12 +85,57 @@ app.get("/api/movie", (req, res, next) => {
 });
 
 // user functions
-app.post("/api/user", (req, res) => {
+app.post("/api/user/", (req, res) => {
   let user = req.body;
-  if (emailIsValid(user.email)) {
+  let existingUsers = database.filter((item) => item.email == user.email);
+  if (emailIsValid(user.email) && !existingUsers.length > 0) {
     id++;
     user = {
       id,
+      ...user,
+    };
+    console.log(user);
+    database.push(user);
+    res.status(201).json({
+      status: 201,
+      result: database,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `Email address ${user.email} is not valid or already exists`,
+    });
+  }
+});
+
+app.get("/api/user/:userId", (req, res, next) => {
+  const userId = req.params.userId;
+  console.log(`User met ID ${userId} gezocht`);
+  let user = database.filter((item) => item.id == userId);
+  if (user.length > 0) {
+    console.log(user);
+    res.status(200).json({
+      status: 200,
+      result: user,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User with ID ${userId} not found`,
+    });
+  }
+});
+
+app.put("/api/user/:userId", (req, res, next) => {
+  let user = req.body;
+  const userId = req.params.userId;
+  if (emailIsValid(user.email)) {
+    id++;
+
+    database.splice(userId - 1, 1);
+    let uId = parseInt(userId);
+    user = {
+      id: uId,
       ...user,
     };
     console.log(user);
@@ -107,8 +152,30 @@ app.post("/api/user", (req, res) => {
   }
 });
 
-app.delete("/api/user", (req, res) => {
-  res.send("DELETE Request Called");
+app.delete("/api/user/:userId", (req, res) => {
+  let user = req.body;
+  const userId = req.params.userId;
+  let existingUsers = database.filter((item) => item.id == userId);
+  let uId = parseInt(userId);
+  if (existingUsers.length > 0) {
+    database.splice(uId - 1, 1);
+    id--;
+
+    user = {
+      id,
+      ...user,
+    };
+    console.log(user);
+    res.status(201).json({
+      status: 201,
+      result: database,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User does not exist`,
+    });
+  }
 });
 
 let emailIsValid = (email) => {
