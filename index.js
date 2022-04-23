@@ -5,11 +5,11 @@ const port = process.env.PORT || 3000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-let movies = [];
-let movieID = 0;
+/* let movies = [];
+let movieID = 0; */
 
-let users = [];
-let userID = 0;
+let database = [];
+let id = 0;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
   });
 });
 
-//Movies
+/* //Movies
 app.post("/api/movie", (req, res) => {
   let movie = req.body;
   movieID++;
@@ -63,19 +63,19 @@ app.get("/api/movie", (req, res, next) => {
     status: 200,
     result: movies,
   });
-});
+}); */
 
 
 //Users
 app.post("/api/user", (req, res) => {
   let user = req.body;
-  userID++;
+  id++;
   user = {
-    userID,
+    id,
     ...user,
   };
   console.log(user);
-  users.push(user);
+  database.push(user);
 
   let validEmail;
 
@@ -100,7 +100,7 @@ app.post("/api/user", (req, res) => {
   if (validEmail == true) {
     res.status(201).json({
       status: 201,
-      result: users,
+      result: database,
     });
   }
 });
@@ -108,14 +108,14 @@ app.post("/api/user", (req, res) => {
 app.get("/api/user", (req, res, next) => {
   res.status(200).json({
     status: 200,
-    result: users,
+    result: database,
   });
 });
 
 app.get("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
   console.log(`User met ID ${userId} gezocht`);
-  let user = users.filter((item) => item.userID == userId);
+  let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
     console.log(user);
     res.status(200).json({
@@ -130,36 +130,26 @@ app.get("/api/user/:userId", (req, res, next) => {
   }
 });
 
-app.delete("/api/user/:userId", (req, res, next) => {
-  let userDeleted;
+//UC-206 Delete a user
+  app.delete("/api/user/:id", (req, res) => {
+    const userId = Number(req.params.id);
+    let user = database.filter((item) => item.id === userId);
 
-  const userId = req.params.userId;
-  console.log(`User with ID ${userId} found, is being removed`);
-  let user = users.filter((item) => item.userID == userId);
-  console.log(user);
+    if (user.length > 0) {
+        //make new array with all users except selected
+        database = database.filter((item) => item.id !== userId);
 
-  for (let i = 0; i < users.length; i++) {
-    if (user.userID == users[i].userID) {
-        users.splice(users[i], 1)
-        console.log(users);
-        userDeleted = true;
+        res.status(200).json({
+            status: 200,
+            message: `User ${userId} succesfully removed`,
+        });
     } else {
-        userDeleted = false;
+        res.status(401).json({
+            status: 401,
+            message: `Can't find user ${userId}`,
+        });
     }
-  }
-
-  if (userDeleted == true) {
-    res.status(200).json({
-      status: 200,
-      result: `User ${userId} deleted succesfully.`,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not removed`,
-    });
-  }
-});
+  });
 
 app.all("*", (req, res) => {
   res.status(401).json({
