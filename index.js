@@ -66,65 +66,70 @@ app.get("/api/movie", (req, res, next) => {
 }); */
 
 
-//Users
-app.post("/api/user", (req, res) => {
-  let user = req.body;
+//------------------------------------------------------------------ Users -----------------------------------------------------------------------
 
-  let validEmail = true;
+//UC-201 Add a user
+  app.post("/api/user", (req, res) => {
+    let user = req.body;
 
-  database.forEach((u) => {
-    if (u.emailAddress === user.emailAddress) {
-        validEmail = false;
-    }
+    let validEmail = true;
+
+    database.forEach((u) => {
+      if (u.emailAddress === user.emailAddress) {
+          validEmail = false;
+      }
+    });
+
+    if (validEmail) {
+
+      id++;
+      user = {
+        id,
+        ...user,
+      };
+
+      console.log(user);
+      database.push(user);
+
+      res.status(201).json({
+        status: 201,
+        result: database,
+      });
+
+    } else {
+      res.status(401).json({
+          status: 401,
+          message: `Email ${user.emailAddress} already in use.`,
+      });
+  }
   });
 
-  if (validEmail) {
-
-    id++;
-    user = {
-      id,
-      ...user,
-    };
-
-    console.log(user);
-    database.push(user);
-
-    res.status(201).json({
-      status: 201,
-      result: database,
-    });
-  } else {
-    res.status(401).json({
-        status: 401,
-        message: `Email ${user.emailAddress} already in use.`,
-    });
-}
-});
-
-app.get("/api/user", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
-});
-
-app.get("/api/user/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  console.log(`User met ID ${userId} gezocht`);
-  let user = database.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    console.log(user);
+//UC-202 Get all users
+  app.get("/api/user", (req, res, next) => {
     res.status(200).json({
       status: 200,
-      result: user,
+      result: database,
     });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not found`,
-    });
-  }
-});
+  });
+
+ //UC-204 Get info of specific user 
+  app.get("/api/user/:userId", (req, res, next) => {
+    const userId = req.params.userId;
+    console.log(`User met ID ${userId} gezocht`);
+    let user = database.filter((item) => item.id == userId);
+    if (user.length > 0) {
+      console.log(user);
+      res.status(200).json({
+        status: 200,
+        result: user,
+      });
+    } else {
+      res.status(401).json({
+        status: 401,
+        result: `User with ID ${userId} not found`,
+      });
+    }
+  });
 
 //UC-206 Delete a user
   app.delete("/api/user/:id", (req, res) => {
