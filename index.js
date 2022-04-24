@@ -30,6 +30,13 @@ const FORBIDDEN_TERMINAL_CHARACTERS = [
 let database = [];
 let id = 0;
 
+/* 
+Post: create data
+Get: get the data
+Put: update the data
+Delete: delete the data
+*/
+
 app.all("*", (req, res, next) => {
   const method = req.method;
   console.log(`Method ${method} is called`);
@@ -167,7 +174,7 @@ app.put("/api/user/:userId", (req, res, next) => {
   } else {
     res.status(401).json({
       status: 401,
-      result: `User does not exist or email is invalid or email is already in use`,
+      result: `User with ID ${userId} does not exist or email is invalid or email is already in use`,
     });
   }
 });
@@ -182,12 +189,12 @@ app.delete("/api/user/:userId", (req, res) => {
     console.log(`User with ID ${userId} deleted`);
     res.status(201).json({
       status: 201,
-      result: "Succesfully deleted user",
+      result: `Succesfully deleted user with ID ${userId} found`,
     });
   } else {
     res.status(401).json({
       status: 401,
-      result: `User does not exist`,
+      result: `User with ID ${userId} does not exist`,
     });
   }
 });
