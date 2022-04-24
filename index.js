@@ -85,6 +85,38 @@ app.get("/api/movie", (req, res, next) => {
 });
 
 // user functions
+app.get("/api/user/profile", (req, res, next) => {
+  res.status(401).json({
+    status: 401,
+    result: "Functionality has not yet been realized",
+  });
+});
+
+app.get("/api/user", (req, res, next) => {
+  res.status(200).json({
+    status: 200,
+    result: database,
+  });
+});
+
+app.get("/api/user/:userId", (req, res, next) => {
+  const userId = req.params.userId;
+  console.log(`User met ID ${userId} gezocht`);
+  let user = database.filter((item) => item.id == userId);
+  if (user.length > 0) {
+    console.log(user);
+    res.status(200).json({
+      status: 200,
+      result: user,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User with ID ${userId} not found`,
+    });
+  }
+});
+
 app.post("/api/user/", (req, res) => {
   let user = req.body;
   let existingUsers = database.filter((item) => item.email == user.email);
@@ -104,24 +136,6 @@ app.post("/api/user/", (req, res) => {
     res.status(401).json({
       status: 401,
       result: `Email address ${user.email} is not valid or already exists`,
-    });
-  }
-});
-
-app.get("/api/user/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  console.log(`User met ID ${userId} gezocht`);
-  let user = database.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    console.log(user);
-    res.status(200).json({
-      status: 200,
-      result: user,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not found`,
     });
   }
 });
@@ -190,31 +204,6 @@ let emailIsValid = (email) => {
 
   return true;
 };
-
-app.get("/api/user/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  console.log(`User met ID ${userId} gezocht`);
-  let user = database.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    console.log(user);
-    res.status(200).json({
-      status: 200,
-      result: user,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not found`,
-    });
-  }
-});
-
-app.get("/api/user", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
-});
 
 app.all("*", (req, res) => {
   res.status(401).json({
