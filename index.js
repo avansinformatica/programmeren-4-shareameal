@@ -24,46 +24,6 @@ app.get("/", (req, res) => {
   });
 });
 
-/* //Movies
-app.post("/api/movie", (req, res) => {
-  let movie = req.body;
-  movieID++;
-  movie = {
-    movieID,
-    ...movie,
-  };
-  console.log(movie);
-  movies.push(movie);
-  res.status(201).json({
-    status: 201,
-    result: movies,
-  });
-});
-app.get("/api/movie/:movieId", (req, res, next) => {
-  const movieId = req.params.movieId;
-  console.log(`Movie with ID ${movieId} searched`);
-  let movie = movies.filter((item) => item.movieID == movieId);
-  if (movie.length > 0) {
-    console.log(movie);
-    res.status(200).json({
-      status: 200,
-      result: movie,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `Movie with ID ${movieId} not found`,
-    });
-  }
-});
-app.get("/api/movie", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: movies,
-  });
-}); */
-
-
 //------------------------------------------------------------------ Users -----------------------------------------------------------------------
 
 //UC-201 Add a user
