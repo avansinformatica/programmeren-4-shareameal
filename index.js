@@ -39,7 +39,6 @@ app.post("/api/movie", (req, res) => {
     result: movies,
   });
 });
-
 app.get("/api/movie/:movieId", (req, res, next) => {
   const movieId = req.params.movieId;
   console.log(`Movie with ID ${movieId} searched`);
@@ -57,7 +56,6 @@ app.get("/api/movie/:movieId", (req, res, next) => {
     });
   }
 });
-
 app.get("/api/movie", (req, res, next) => {
   res.status(200).json({
     status: 200,
@@ -75,7 +73,7 @@ app.get("/api/movie", (req, res, next) => {
 
     //Email validation
     database.forEach((u) => {
-      if (u.emailAddress === user.emailAddress) {
+      if (u.emailAddress == user.emailAddress) {
           validEmail = false;
       }
     });
@@ -99,9 +97,11 @@ app.get("/api/movie", (req, res, next) => {
     } else {
       res.status(401).json({
           status: 401,
-          message: `Email ${email} already in use.`,
+          message: `Email ${user.emailAddress} already in use.`,
       });
   }
+
+  res.end();
   });
 
 //UC-202 Get all users
@@ -110,6 +110,17 @@ app.get("/api/movie", (req, res, next) => {
       status: 200,
       result: database,
     });
+    res.end();
+  });
+
+//UC-203 Request personal user profile
+  app.get("/api/user/profile", (req, res) => {
+    res.status(200).json({
+        code: 200,
+        message: "This functionality hasn't been added yet.",
+    });
+
+    res.end();
   });
 
  //UC-204 Get info of specific user 
@@ -129,6 +140,7 @@ app.get("/api/movie", (req, res, next) => {
         result: `User with ID ${userId} not found`,
       });
     }
+    res.end();
   });
 
 //UC-205 Update a user
@@ -139,16 +151,14 @@ app.get("/api/movie", (req, res, next) => {
     let validEmail = true;
 
     newUser = {
-      id,
+      userId,
       ...user,
     }
 
-    let email = req.body.emailAddress;
-
-    const otherUsers = database.filter((item) => item.id !== id);
+    const otherUsers = database.filter((item) => item.id !== userId);
 
     otherUsers.forEach((u) => {
-        if (u.emailAddress == email) {
+        if (u.emailAddress == newUser.emailAddress) {
             validEmail = false;
         }
     });    
@@ -156,7 +166,9 @@ app.get("/api/movie", (req, res, next) => {
     let selectedUser = database.filter((item) => item.id == userId);
 
     if (selectedUser != null && validEmail) {
-      database.splice(selectedUser, 1, user);
+      index = database.findIndex((obj) => obj.id == userId);
+      database[index] = newUser;
+
       res.status(201).json({
           status: 201,
           result: `User ${userId} succesfully updated.`,
@@ -164,7 +176,7 @@ app.get("/api/movie", (req, res, next) => {
     } else if (selectedUser != null && !validEmail) {
       res.status(400).json({
       status: 400,
-      message: `Email ${email} is already in use.`,
+      message: `Email ${newUser.emailAddress} is already in use.`,
       });
     } else {
       res.status(401).json({
@@ -172,8 +184,7 @@ app.get("/api/movie", (req, res, next) => {
         result: `User with ID ${userId} not found`,
       });
     }
-
-
+    res.end();
   });
 
 //UC-206 Delete a user
@@ -195,6 +206,7 @@ app.get("/api/movie", (req, res, next) => {
             message: `Can't find user ${userId}`,
         });
     }
+    res.end();
   });
 
 app.all("*", (req, res) => {
@@ -202,6 +214,7 @@ app.all("*", (req, res) => {
     status: 401,
     result: "End-point not found",
   });
+  res.end();
 });
 
 app.listen(port, () => {
