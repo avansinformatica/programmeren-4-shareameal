@@ -59,6 +59,13 @@ app.post("/api/movie", (req, res) => {
   });
 });
 
+app.get("/api/movie", (req, res, next) => {
+  res.status(200).json({
+    status: 200,
+    result: database,
+  });
+});
+
 app.get("/api/movie/:movieId", (req, res, next) => {
   const movieId = req.params.movieId;
   console.log(`Movie met ID ${movieId} gezocht`);
@@ -77,47 +84,8 @@ app.get("/api/movie/:movieId", (req, res, next) => {
   }
 });
 
-app.get("/api/movie", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
-});
-
 // user functions
-app.get("/api/user/profile", (req, res, next) => {
-  res.status(401).json({
-    status: 401,
-    result: "Functionality has not yet been realized",
-  });
-});
-
-app.get("/api/user", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
-});
-
-app.get("/api/user/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  console.log(`User met ID ${userId} gezocht`);
-  let user = database.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    console.log(user);
-    res.status(200).json({
-      status: 200,
-      result: user,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not found`,
-    });
-  }
-});
-
-app.post("/api/user/", (req, res) => {
+app.post("/api/user", (req, res) => {
   let user = req.body;
   let existingUsers = database.filter((item) => item.email == user.email);
   if (emailIsValid(user.email) && !existingUsers.length > 0) {
@@ -140,12 +108,43 @@ app.post("/api/user/", (req, res) => {
   }
 });
 
+app.get("/api/user", (req, res, next) => {
+  res.status(200).json({
+    status: 200,
+    result: database,
+  });
+});
+
+app.get("/api/user/profile", (req, res, next) => {
+  res.status(401).json({
+    status: 401,
+    result: "Functionality has not yet been realized",
+  });
+});
+
+app.get("/api/user/:userId", (req, res, next) => {
+  const userId = req.params.userId;
+  console.log(`User met ID ${userId} gezocht`);
+  let user = database.filter((item) => item.id == userId);
+  if (user.length > 0) {
+    console.log(user);
+    res.status(200).json({
+      status: 200,
+      result: user,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User with ID ${userId} not found`,
+    });
+  }
+});
+
 app.put("/api/user/:userId", (req, res, next) => {
   let user = req.body;
   const userId = req.params.userId;
   if (emailIsValid(user.email)) {
     id++;
-
     database.splice(userId - 1, 1);
     let uId = parseInt(userId);
     user = {
@@ -174,7 +173,6 @@ app.delete("/api/user/:userId", (req, res) => {
   if (existingUsers.length > 0) {
     uId -= id;
     database.splice(uId - 1, 1);
-
     user = {
       id,
       ...user,
