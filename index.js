@@ -71,9 +71,9 @@ app.get("/api/movie", (req, res, next) => {
 //UC-201 Add a user
   app.post("/api/user", (req, res) => {
     let user = req.body;
-
     let validEmail = true;
 
+    //Email validation
     database.forEach((u) => {
       if (u.emailAddress === user.emailAddress) {
           validEmail = false;
@@ -99,7 +99,7 @@ app.get("/api/movie", (req, res, next) => {
     } else {
       res.status(401).json({
           status: 401,
-          message: `Email ${user.emailAddress} already in use.`,
+          message: `Email ${email} already in use.`,
       });
   }
   });
@@ -131,9 +131,54 @@ app.get("/api/movie", (req, res, next) => {
     }
   });
 
+//UC-205 Update a user
+  app.put("/api/user/:id", (req, res) => {
+    const userId = req.params.id;
+
+    let user = req.body;
+    let validEmail = true;
+
+    newUser = {
+      id,
+      ...user,
+    }
+
+    let email = req.body.emailAddress;
+
+    const otherUsers = database.filter((item) => item.id !== id);
+
+    otherUsers.forEach((u) => {
+        if (u.emailAddress == email) {
+            validEmail = false;
+        }
+    });    
+
+    let selectedUser = database.filter((item) => item.id == userId);
+
+    if (selectedUser != null && validEmail) {
+      database.splice(selectedUser, 1, user);
+      res.status(201).json({
+          status: 201,
+          result: `User ${userId} succesfully updated.`,
+      });
+    } else if (selectedUser != null && !validEmail) {
+      res.status(400).json({
+      status: 400,
+      message: `Email ${email} is already in use.`,
+      });
+    } else {
+      res.status(401).json({
+        status: 401,
+        result: `User with ID ${userId} not found`,
+      });
+    }
+
+
+  });
+
 //UC-206 Delete a user
-  app.delete("/api/user/:id", (req, res) => {
-    const userId = Number(req.params.id);
+  app.delete("/api/user/:userId", (req, res) => {
+    const userId = Number(req.params.userId);
     let user = database.filter((item) => item.id === userId);
 
     if (user.length > 0) {
