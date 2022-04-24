@@ -32,7 +32,7 @@ let id = 0;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
-  console.log(`Method ${method} is aangeroepen`);
+  console.log(`Method ${method} is called`);
   next();
 });
 
@@ -68,7 +68,7 @@ app.get("/api/movie", (req, res, next) => {
 
 app.get("/api/movie/:movieId", (req, res, next) => {
   const movieId = req.params.movieId;
-  console.log(`Movie met ID ${movieId} gezocht`);
+  console.log(`Movie with ID ${movieId} searched`);
   let movie = database.filter((item) => item.id == movieId);
   if (movie.length > 0) {
     console.log(movie);
@@ -87,8 +87,8 @@ app.get("/api/movie/:movieId", (req, res, next) => {
 // user functions
 app.post("/api/user", (req, res) => {
   let user = req.body;
-  let existingUsers = database.filter((item) => item.email == user.email);
-  if (emailIsValid(user.email) && !existingUsers.length > 0) {
+  let existingUser = database.filter((item) => item.email == user.email);
+  if (emailIsValid(user.email) && !existingUser.length > 0) {
     id++;
     user = {
       id,
@@ -124,7 +124,7 @@ app.get("/api/user/profile", (req, res, next) => {
 
 app.get("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
-  console.log(`User met ID ${userId} gezocht`);
+  console.log(`User with ID ${userId} searched`);
   let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
     console.log(user);
@@ -143,34 +143,13 @@ app.get("/api/user/:userId", (req, res, next) => {
 app.put("/api/user/:userId", (req, res, next) => {
   let user = req.body;
   const userId = req.params.userId;
-  if (emailIsValid(user.email)) {
-    id++;
-    database.splice(userId - 1, 1);
-    let uId = parseInt(userId);
-    user = {
-      id: uId,
-      ...user,
-    };
-    console.log(user);
-    database.push(user);
-    res.status(201).json({
-      status: 201,
-      result: database,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `Email address ${user.email} is not valid`,
-    });
-  }
-});
-
-app.delete("/api/user/:userId", (req, res) => {
-  let user = req.body;
-  const userId = req.params.userId;
-  let existingUsers = database.filter((item) => item.id == userId);
+  let existingUser = database.filter((item) => item.id == userId);
   let uId = parseInt(userId);
-  if (existingUsers.length > 0) {
+  if (
+    emailIsValid(user.email) &&
+    existingUser.length > 0 &&
+    user.email === existingUser[0].email
+  ) {
     uId -= id;
     database.splice(uId - 1, 1);
     user = {
@@ -178,9 +157,32 @@ app.delete("/api/user/:userId", (req, res) => {
       ...user,
     };
     console.log(user);
+    id++;
+    database.push(user);
+    id--;
     res.status(201).json({
       status: 201,
       result: database,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User does not exist or email is invalid or email is already in use`,
+    });
+  }
+});
+
+app.delete("/api/user/:userId", (req, res) => {
+  const userId = req.params.userId;
+  let existingUsers = database.filter((item) => item.id == userId);
+  let uId = parseInt(userId);
+  if (existingUsers.length > 0) {
+    uId -= id;
+    database.splice(uId - 1, 1);
+    console.log(`User with ID ${userId} deleted`);
+    res.status(201).json({
+      status: 201,
+      result: "Succesfully deleted user",
     });
   } else {
     res.status(401).json({
