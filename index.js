@@ -158,8 +158,8 @@ app.delete("/api/user/:userId", (req, res) => {
   let existingUsers = database.filter((item) => item.id == userId);
   let uId = parseInt(userId);
   if (existingUsers.length > 0) {
+    uId -= id;
     database.splice(uId - 1, 1);
-    id--;
 
     user = {
       id,
