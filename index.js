@@ -95,8 +95,8 @@ app.get("/api/movie/:movieId", (req, res, next) => {
 // user functions
 app.post("/api/user", (req, res) => {
   let user = req.body;
-  let existingUser = database.filter((item) => item.email == user.email);
-  if (emailIsValid(user.email) && !existingUser.length > 0) {
+  let existingUsers = database.filter((item) => item.email == user.email);
+  if (emailIsValid(user.email) && !existingUsers.length > 0) {
     id++;
     user = {
       id,
@@ -152,23 +152,21 @@ app.get("/api/user/:userId", (req, res, next) => {
 app.put("/api/user/:userId", (req, res, next) => {
   let user = req.body;
   const userId = req.params.userId;
-  let existingUser = database.filter((item) => item.id == userId);
+  let existingUsers = database.filter((item) => item.id == userId);
+  const existingIndex = database.findIndex((item) => item.id == userId);
   let uId = parseInt(userId);
   if (
     emailIsValid(user.email) &&
-    existingUser.length > 0 &&
-    user.email === existingUser[0].email
+    existingUsers.length > 0 &&
+    user.email === existingUsers[0].email
   ) {
-    uId -= id;
-    database.splice(uId - 1, 1);
+    database.splice(existingIndex, 1);
     user = {
-      id,
+      id: uId,
       ...user,
     };
     console.log(user);
-    id++;
     database.push(user);
-    id--;
     res.status(201).json({
       status: 201,
       result: database,
@@ -183,13 +181,10 @@ app.put("/api/user/:userId", (req, res, next) => {
 
 app.delete("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
-  let existingUsers = database.filter((item) => item.id == userId);
-  let uId = parseInt(userId);
-  if (existingUsers.length > 0) {
-    uId -= id;
-    database.splice(uId - 1, 1);
-    console.log(`Succesfully deleted user with ID ${userId}, result:`);
-    console.log(database);
+  const existingIndex = database.findIndex((item) => item.id == userId);
+  if (existingIndex != -1) {
+    database.splice(existingIndex, 1);
+    console.log(`Succesfully deleted user with ID ${userId}`);
     res.status(201).json({
       status: 201,
       result: database,
