@@ -97,6 +97,18 @@ app.put("/api/user/:userId", (req, res, next) => {
   console.log(`User met ID ${userId} wordt gezocht`);
   let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
+    let databaseT = database.splice(userId);
+    database = databaseT;
+
+    let user = req.body;
+    id++;
+    user = {
+      id,
+      ...user,
+    };
+    console.log(user);
+    database.push(user);
+
     res.status(200).json({
       status: 200,
       result: "In PUT",
@@ -116,9 +128,8 @@ app.delete("/api/user/:userId", (req, res, next) => {
   console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
   let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
-    // let databaseT =
-    database.splice(userId);
-    // database = databaseT;
+    let databaseT = database.splice(userId);
+    database = databaseT;
     res.status(200).json({
       status: 200,
       result: database,
