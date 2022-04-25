@@ -189,7 +189,7 @@ app.delete("/api/user/:userId", (req, res) => {
     console.log(`User with ID ${userId} deleted`);
     res.status(201).json({
       status: 201,
-      result: `Succesfully deleted user with ID ${userId} found`,
+      result: `Succesfully deleted user with ID ${userId}`,
     });
   } else {
     res.status(401).json({
