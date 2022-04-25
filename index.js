@@ -67,6 +67,7 @@ app.post("/api/movie", (req, res) => {
 });
 
 app.get("/api/movie", (req, res, next) => {
+  console.log(database);
   res.status(200).json({
     status: 200,
     result: database,
@@ -116,6 +117,7 @@ app.post("/api/user", (req, res) => {
 });
 
 app.get("/api/user", (req, res, next) => {
+  console.log(database);
   res.status(200).json({
     status: 200,
     result: database,
@@ -186,10 +188,11 @@ app.delete("/api/user/:userId", (req, res) => {
   if (existingUsers.length > 0) {
     uId -= id;
     database.splice(uId - 1, 1);
-    console.log(`User with ID ${userId} deleted`);
+    console.log(`Succesfully deleted user with ID ${userId}, result:`);
+    console.log(database);
     res.status(201).json({
       status: 201,
-      result: `Succesfully deleted user with ID ${userId}`,
+      result: database,
     });
   } else {
     res.status(401).json({
