@@ -84,9 +84,53 @@ app.get("/api/user", (req, res, next) => {
 //    - Error response: code 401 statusCode
 //      + message
 
+app.get("/api/user/profile", (req, res, next) => {
+  res.status(404).json({
+    status: 404,
+    result: `Dit endpoint is nog niet gerealiseerd`,
+  });
+});
+
 // UC-205 Update a single user
+app.put("/api/user/:userId", (req, res, next) => {
+  const userId = req.params.userId;
+  console.log(`User met ID ${userId} wordt gezocht`);
+  let user = database.filter((item) => item.id == userId);
+  if (user.length > 0) {
+    // database.spilce(userId, 0, user); // Update info form user.
+    res.status(200).json({
+      status: 200,
+      result: user,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User with ID ${userId} not found`,
+    });
+  }
+});
 
 // UC-206 Delete a user
+
+app.delete("/api/user/:userId", (req, res, next) => {
+  const userId = req.params.userId;
+  console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
+  let user = database.filter((item) => item.id == userId);
+  if (user.length > 0) {
+    let databaseT = database.splice(userId);
+    database = databaseT;
+    // database.splice(userId, 1, 0); //++++++++++++
+    res.status(200).json({
+      status: 200,
+      result: database,
+    });
+  } else {
+    res.status(401).json({
+      status: 401,
+      result: `User with ID ${userId} not found`,
+    });
+  }
+});
 
 app.all("*", (req, res) => {
   res.status(401).json({
