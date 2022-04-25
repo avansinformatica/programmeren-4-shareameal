@@ -117,10 +117,14 @@ app.delete("/api/user/:userId", (req, res, next) => {
   console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
   let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
-    let lists = list.filter((x) => {
-      return x.Id != userId;
+    // var myArr = [{id:'a'},{id:'myid'},{id:'c'}];
+
+    let index = arr.findIndex(function (o) {
+      return o.id == userId;
     });
-    database = lists;
+    if (index !== -1) database.splice(index, 1);
+
+    // database.splice(userId, 1, 0); //++++++++++++
     res.status(200).json({
       status: 200,
       result: database,
