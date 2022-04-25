@@ -30,13 +30,6 @@ const FORBIDDEN_TERMINAL_CHARACTERS = [
 let database = [];
 let id = 0;
 
-/* 
-Post: create data
-Get: get the data
-Put: update the data
-Delete: delete the data
-*/
-
 app.all("*", (req, res, next) => {
   const method = req.method;
   console.log(`Method ${method} is called`);
