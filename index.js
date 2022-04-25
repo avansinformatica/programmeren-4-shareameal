@@ -116,9 +116,9 @@ app.delete("/api/user/:userId", (req, res, next) => {
   console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
   let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
-    let databaseT = database.splice(userId);
-    database = databaseT;
-    // database.splice(userId, 1, 0); //++++++++++++
+    // let databaseT =
+    database.splice(userId);
+    // database = databaseT;
     res.status(200).json({
       status: 200,
       result: database,
