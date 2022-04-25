@@ -30,7 +30,6 @@ app.get("/", (req, res) => {
 //    - Succes response: user is toegevoegd
 //      in database, userdata inclusief id
 //      wordt geretourneerd.
-
 app.post("/api/user", (req, res) => {
   let user = req.body;
   id++;
@@ -47,7 +46,6 @@ app.post("/api/user", (req, res) => {
 });
 
 // UC-204 Get singel user by ID
-
 app.get("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
   console.log(`User met ID ${userId} gezocht`);
@@ -70,7 +68,6 @@ app.get("/api/user/:userId", (req, res, next) => {
 //    - Succes response: code 200 result:
 //      result: nul of meer userobjecten
 //      in een array
-
 app.get("/api/user", (req, res, next) => {
   res.status(200).json({
     status: 200,
@@ -83,7 +80,6 @@ app.get("/api/user", (req, res, next) => {
 //    een JWT met userId
 //    - Error response: code 401 statusCode
 //      + message
-
 app.get("/api/user/profile", (req, res, next) => {
   res.status(404).json({
     status: 404,
@@ -111,7 +107,7 @@ app.put("/api/user/:userId", (req, res, next) => {
 
     res.status(200).json({
       status: 200,
-      result: "In PUT",
+      result: database,
     });
   } else {
     res.status(401).json({
@@ -122,7 +118,6 @@ app.put("/api/user/:userId", (req, res, next) => {
 });
 
 // UC-206 Delete a user
-
 app.delete("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
   console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
