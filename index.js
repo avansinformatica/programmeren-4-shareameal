@@ -97,10 +97,9 @@ app.put("/api/user/:userId", (req, res, next) => {
   console.log(`User met ID ${userId} wordt gezocht`);
   let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
-    // database.spilce(userId, 0, user); // Update info form user.
     res.status(200).json({
       status: 200,
-      result: user,
+      result: "In PUT",
     });
   } else {
     res.status(401).json({
@@ -117,13 +116,8 @@ app.delete("/api/user/:userId", (req, res, next) => {
   console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
   let user = database.filter((item) => item.id == userId);
   if (user.length > 0) {
-    // var myArr = [{id:'a'},{id:'myid'},{id:'c'}];
-
-    let index = arr.findIndex(function (o) {
-      return o.id == userId;
-    });
-    if (index !== -1) database.splice(index, 1);
-
+    let databaseT = database.splice(userId);
+    database = databaseT;
     // database.splice(userId, 1, 0); //++++++++++++
     res.status(200).json({
       status: 200,
