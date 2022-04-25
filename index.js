@@ -13,8 +13,6 @@ app.all("*", (req, res, next) => {
   console.log(`Method ${method} is aangeroepen`);
   next();
 });
-//test 123
-//test 456
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -23,45 +21,72 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/api/movie", (req, res) => {
-  let movie = req.body;
+// UC-201 Register as a new user
+//    - emailAdress is uniek
+//    - Error response: als emailAdress niet
+//      uniek: user is niet toegevoegd in
+//      database statusCode + message
+//      geretourneerd
+//    - Succes response: user is toegevoegd
+//      in database, userdata inclusief id
+//      wordt geretourneerd.
+
+app.post("/api/user", (req, res) => {
+  let user = req.body;
   id++;
-  movie = {
+  user = {
     id,
-    ...movie,
+    ...user,
   };
-  console.log(movie);
-  database.push(movie);
+  console.log(user);
+  database.push(user);
   res.status(201).json({
     status: 201,
     result: database,
   });
 });
 
-app.get("/api/movie/:movieId", (req, res, next) => {
-  const movieId = req.params.movieId;
-  console.log(`Movie met ID ${movieId} gezocht`);
-  let movie = database.filter((item) => item.id == movieId);
-  if (movie.length > 0) {
-    console.log(movie);
+// UC-204 Get singel user by ID
+
+app.get("/api/user/:userId", (req, res, next) => {
+  const userId = req.params.userId;
+  console.log(`User met ID ${userId} gezocht`);
+  let user = database.filter((item) => item.id == userId);
+  if (user.length > 0) {
+    console.log(user);
     res.status(200).json({
       status: 200,
-      result: movie,
+      result: user,
     });
   } else {
     res.status(401).json({
       status: 401,
-      result: `Movie with ID ${movieId} not found`,
+      result: `User with ID ${userId} not found`,
     });
   }
 });
 
-app.get("/api/movie", (req, res, next) => {
+// UC-202 Get all users
+//    - Succes response: code 200 result:
+//      result: nul of meer userobjecten
+//      in een array
+
+app.get("/api/user", (req, res, next) => {
   res.status(200).json({
     status: 200,
     result: database,
   });
 });
+
+// UC-203 Request personal user profile
+//    de user is ingelogd, het request bevat
+//    een JWT met userId
+//    - Error response: code 401 statusCode
+//      + message
+
+// UC-205 Update a single user
+
+// UC-206 Delete a user
 
 app.all("*", (req, res) => {
   res.status(401).json({
