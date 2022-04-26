@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const userController = require("../controllers/user.controller");
 
 let database = [];
 let id = 0;
@@ -11,6 +12,7 @@ router.get("/", (req, res) => {
   });
 });
 
+// IN CONTROLLER
 // UC-201 Register as a new user
 //    - emailAdress is uniek
 //    - Error response: als emailAdress niet
@@ -20,50 +22,18 @@ router.get("/", (req, res) => {
 //    - Succes response: user is toegevoegd
 //      in database, userdata inclusief id
 //      wordt geretourneerd.
-router.post("/api/user", (req, res) => {
-  let user = req.body;
-  id++;
-  user = {
-    id,
-    ...user,
-  };
-  console.log(user);
-  database.push(user);
-  res.status(201).json({
-    status: 201,
-    result: database,
-  });
-});
+router.post("/api/user", userController.addUser);
 
-// UC-204 Get singel user by ID
-router.get("/api/user/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  console.log(`User met ID ${userId} gezocht`);
-  let user = database.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    console.log(user);
-    res.status(200).json({
-      status: 200,
-      result: user,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not found`,
-    });
-  }
-});
-
+// IN CONTROLLER
 // UC-202 Get all users
 //    - Succes response: code 200 result:
 //      result: nul of meer userobjecten
 //      in een array
-router.get("/api/user", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
-});
+router.get("/api/user", userController.getAllUsers);
+
+// IN CONTROLLER
+// UC-204 Get singel user by ID
+router.get("/api/user/:userId", userController.getUserById);
 
 // UC-203 Request personal user profile
 //    de user is ingelogd, het request bevat
@@ -127,4 +97,4 @@ router.delete("/api/user/:userId", (req, res, next) => {
   }
 });
 
-module.exorts = router;
+module.exports = router;
