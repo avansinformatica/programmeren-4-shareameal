@@ -22,7 +22,7 @@ router.get("/", (req, res) => {
 //    - Succes response: user is toegevoegd
 //      in database, userdata inclusief id
 //      wordt geretourneerd.
-router.post("/api/user", userController.addUser);
+router.post("/api/user", userController.validateUser, userController.addUser);
 
 // IN CONTROLLER
 // UC-202 Get all users
