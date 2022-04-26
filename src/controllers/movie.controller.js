@@ -15,7 +15,7 @@ module.exports = {
         // We geven in de createMovie functie de callbackfunctie mee. Die kan een error of een result teruggeven.
         database.createMovie(req.body, (error, result) => {
             if (error) {
-                console.log(`index.js: ${error}`)
+                console.log(`index.js : ${error}`)
                 res.status(401).json({
                     statusCode: 401,
                     error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
