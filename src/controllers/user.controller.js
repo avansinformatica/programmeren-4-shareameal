@@ -13,12 +13,11 @@ let controller = {
 
       next();
     } catch (err) {
-      console.log(err.code);
-      console.log(err.message);
-      res.status(400).json({
+      const error = {
         status: 400,
-        result: err.toString,
-      });
+        message: err.message,
+      };
+      next(err);
     }
   },
   addUser: (req, res) => {
@@ -41,7 +40,7 @@ let controller = {
       result: database,
     });
   },
-  getUserById: (req, res) => {
+  getUserById: (req, res, next) => {
     const userId = req.params.userId;
     console.log(`User met ID ${userId} gezocht`);
     let user = database.filter((item) => item.id == userId);
@@ -52,10 +51,11 @@ let controller = {
         result: user,
       });
     } else {
-      res.status(401).json({
-        status: 401,
+      const error = {
+        status: 404,
         result: `User with ID ${userId} not found`,
-      });
+      };
+      next(error);
     }
   },
 };

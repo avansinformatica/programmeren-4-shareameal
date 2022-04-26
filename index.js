@@ -3,6 +3,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const bodyParser = require("body-parser");
 const userRouter = require("./src/routes/user.routes");
+const res = require("express/lib/response");
 
 app.use(bodyParser.json());
 
@@ -19,6 +20,11 @@ app.all("*", (req, res) => {
     status: 401,
     result: "End-point not found",
   });
+});
+
+// Error handler
+app.use((err, res, res, next) => {
+  res.status(err.status).json(err);
 });
 
 app.listen(port, () => {
