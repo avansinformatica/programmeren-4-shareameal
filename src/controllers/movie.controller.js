@@ -1,4 +1,6 @@
 const database = require('../../database/inmemdb')
+const assert = require('assert')
+
 /**
  * We exporteren hier een object. Dat object heeft attributen met een waarde.
  * Die waarde kan een string, number, boolean, array, maar ook een functie zijn.
@@ -54,5 +56,33 @@ module.exports = {
                 result,
             })
         })
+    },
+
+    validateMovie: (req, res, next) => {
+        // We krijgen een movie object binnen via de req.body.
+        // Dat object splitsen we hier via object decomposition
+        // in de afzonderlijke attributen.
+        const { title, year, studio } = req.body
+        try {
+            // assert is een nodejs library om attribuutwaarden te valideren.
+            // Bij een true gaan we verder, bij een false volgt een exception die we opvangen.
+            assert.equal(typeof title, 'string', 'title must be a string')
+            assert.equal(typeof year, 'number', 'year must be a number')
+            // als er geen exceptions waren gaan we naar de next routehandler functie.
+            next()
+        } catch (err) {
+            // Hier kom je als een assert failt.
+            console.log(`Error message: ${err.message}`)
+            console.log(`Error code: ${err.code}`)
+            // Hier geven we een generiek errorobject terug. Dat moet voor alle
+            // foutsituaties dezelfde structuur hebben. Het is nog mooier om dat
+            // via de Express errorhandler te doen; dan heb je één plek waar je
+            // alle errors afhandelt.
+            // zie de Express handleiding op https://expressjs.com/en/guide/error-handling.html
+            res.status(400).json({
+                statusCode: 400,
+                error: err.message,
+            })
+        }
     },
 }
