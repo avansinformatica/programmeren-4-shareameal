@@ -35,3 +35,7 @@ app.all('*', (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+// we exporteren de Express app server zodat we die in
+// de integration-testcases kunnen gebruiken.
+module.exports = app
