@@ -15,9 +15,9 @@ let controller = {
     } catch (err) {
       const error = {
         status: 400,
-        message: err.message,
+        result: err.message,
       };
-      next(err);
+      next(error);
     }
   },
   addUser: (req, res) => {

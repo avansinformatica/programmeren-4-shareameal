@@ -23,10 +23,12 @@ app.all("*", (req, res) => {
 });
 
 // Error handler
-app.use((err, res, res, next) => {
+app.use((err, req, res, next) => {
   res.status(err.status).json(err);
 });
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+module.exports = app;
