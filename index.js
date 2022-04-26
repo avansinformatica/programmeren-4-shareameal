@@ -33,7 +33,7 @@ app.get("/", (req, res) => {
 
     //Email validation
     database.forEach((u) => {
-      if (u.emailAddress == user.emailAddress) {
+      if (u.emailAdress == user.emailAdress) {
           validEmail = false;
       }
     });
@@ -57,7 +57,7 @@ app.get("/", (req, res) => {
     } else {
       res.status(401).json({
           status: 401,
-          message: `Email ${user.emailAddress} already in use.`,
+          message: `Email ${user.emailAdress} already in use.`,
       });
   }
 
@@ -118,7 +118,7 @@ app.get("/", (req, res) => {
     const otherUsers = database.filter((item) => item.id !== userId);
 
     otherUsers.forEach((u) => {
-        if (u.emailAddress == newUser.emailAddress) {
+        if (u.emailAdress == newUser.emailAdress) {
             validEmail = false;
         }
     });    
@@ -136,7 +136,7 @@ app.get("/", (req, res) => {
     } else if (selectedUser != null && !validEmail) {
       res.status(400).json({
       status: 400,
-      message: `Email ${newUser.emailAddress} is already in use.`,
+      message: `Email ${newUser.emailAdress} is already in use.`,
       });
     } else {
       res.status(401).json({
