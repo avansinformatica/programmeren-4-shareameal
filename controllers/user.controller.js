@@ -12,7 +12,6 @@ let controller = {
                 validEmail = false;
             }
         });  
-
         next();
     },
 
@@ -26,7 +25,7 @@ let controller = {
             password, 
             phoneNumber} = user;
 
-            console.log(user);
+    
         try {
             assert(typeof firstName === 'string', 'First name must be a string')
             assert(typeof lastName === 'string', 'Last name must be a string')
@@ -58,7 +57,6 @@ let controller = {
             ...user,
           };
     
-          console.log(user);
           database.push(user);
     
           res.status(201).json({
@@ -94,7 +92,6 @@ let controller = {
         console.log(`User met ID ${userId} gezocht`);
         let user = database.filter((item) => item.id == userId);
         if (user.length > 0) {
-          console.log(user);
           res.status(200).json({
             status: 200,
             result: user,
@@ -102,7 +99,7 @@ let controller = {
         } else {
             const error = {
                 status: 400,
-                result: `Movie with ID ${userId} not found`,
+                result: `User with ID ${userId} not found`,
             }
             next(error);
         }
@@ -148,7 +145,7 @@ let controller = {
         } else {
             const error = {
                 status: 400,
-                result: `Movie with ID ${userId} not found`,
+                result: `User with ID ${userId} not found`,
             }
             next(error);
         }
@@ -169,7 +166,7 @@ let controller = {
         } else {
             const error = {
                 status: 400,
-                result: `Movie with ID ${userId} not found`,
+                result: `User with ID ${userId} not found`,
             }
             next(error);
         }
