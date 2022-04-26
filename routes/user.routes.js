@@ -6,7 +6,7 @@ const userController = require('../controllers/user.controller');
 router.get("/", (req, res) => {
     res.status(200).json({
       status: 200,
-      result: "Hello World",
+      result: "Welcome to Juliet's share a meal server",
     });
   });
 
