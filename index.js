@@ -1,20 +1,9 @@
 const express = require('express')
-// De database importeren we nu uit het externe bestand.
-const database = require('./database/inmemdb')
 const movieRoutes = require('./src/routes/movie.routes')
 
+const port = process.env.PORT
 const app = express()
-const port = process.env.PORT || 3000
-
-// const bodyParser = require("body-parser");
-// app.use(bodyParser.json());
-
-// express heeft tegenwoordig de bodyParser geïntegreerd.
-// hoeft niet meer apart geïnstalleerd en geïmporteerd te worden.
 app.use(express.json())
-
-// let database = [];
-let id = 0
 
 app.all('*', (req, res, next) => {
     const method = req.method
@@ -22,7 +11,7 @@ app.all('*', (req, res, next) => {
     next()
 })
 
-// Alle movieRoutes beginnen met /api
+// Alle routes beginnen met /api
 app.use('/api', movieRoutes)
 
 app.all('*', (req, res) => {
@@ -31,6 +20,8 @@ app.all('*', (req, res) => {
         result: 'End-point not found',
     })
 })
+
+// Hier moet je nog je Express errorhandler toevoegen.
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

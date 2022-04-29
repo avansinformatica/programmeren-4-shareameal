@@ -32,7 +32,9 @@ module.exports = {
                 const movieToAdd = {
                     id: id++,
                     ...movie,
+                    isActive: false,
                 }
+
                 _moviedb.push(movieToAdd)
                 // roep de callback aan, zonder error, maar met de nieuwe movie als result.
                 callback(undefined, movieToAdd)
@@ -55,15 +57,69 @@ module.exports = {
         }, timeout)
     },
 
-    getMovieById() {
-        // zelf uitwerken
+    getMovieById(movieId, callback) {
+        setTimeout(() => {
+            let filteredMovies = _moviedb.filter((item) => item.id === movieId)
+            if (filteredMovies.length > 0) {
+                console.log(movie)
+                callback(undefined, filteredMovies[0])
+            } else {
+                const error = {
+                    status: 401,
+                    message: `Movie with ID ${movieId} not found`,
+                }
+                callback(error, undefined)
+            }
+        }, timeout)
     },
 
-    updateMovie() {
-        // zelf uitwerken
+    updateMovieById(movieId, updateMovie, callback) {
+        let updatedMovie = []
+        setTimeout(() => {
+            // vind movie binnen de database array
+            _moviedb.forEach((item, index, array) => {
+                if (item.id == movieId) {
+                    // gevonden movie updaten door de meegegeven properties van het updatedMovie object
+                    array[index] = {
+                        ...array[index],
+                        ...update,
+                    }
+                    // updated movie opslaan voor callback
+                    updatedMovie.push(array[index])
+                }
+            })
+            if (updatedMovie.length > 0) {
+                callback(undefined, updatedMovie)
+            } else {
+                const error = {
+                    status: 404,
+                    message: `Movie with ID ${movieId} not found`,
+                }
+                callback(error, undefined)
+            }
+        }, timeout)
     },
 
-    deleteMovie() {
-        // zelf uitwerken
+    deleteMovieById: (movieId, callback) => {
+        let deletedMovie = []
+        setTimeout(() => {
+            _moviedb.forEach((item, index, array) => {
+                if (item.id == movieId) {
+                    // verwijderde movie opslaan voor callback
+                    deletedMovie.push(array[index])
+                    // gevonden movie uit de database verwijderen
+                    array.splice(index, 1)
+                }
+            })
+            if (deletedMovie.length > 0) {
+                callback(undefined, deletedMovie)
+            } else {
+                const error = {
+                    status: 404,
+                    message: `Movie with ID ${movieId} not found`,
+                }
+                callback(error, undefined)
+            }
+        }, timeout)
     },
 }
