@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const bodyParser = require("body-parser");
-const userRouter = require('./routes/user.routes');
+const userRouter = require('./src/routes/user.routes');
 app.use(bodyParser.json());
 
 app.all("*", (req, res, next) => {

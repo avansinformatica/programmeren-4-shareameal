@@ -1,10 +1,10 @@
 const assert = require('assert');
-let database = [];
+const database = require('../../database/inmemdb')
 let id = 0;
 let validEmail = true;
 
 let controller = {
-    validateEmail:(req, res, next) =>{
+/*     validateEmail:(req, res, next) =>{
         let user = req.body;
 
         database.forEach((u) => {
@@ -13,7 +13,7 @@ let controller = {
             }
         });  
         next();
-    },
+    }, */
 
     validateUser:(req, res, next) => {
         let user = req.body;
@@ -48,7 +48,24 @@ let controller = {
     },
 
     addUser:(req, res, next) => {
-        let user = req.body;
+        database.addUser(req.body, (error, result) => {
+            if (error) {
+                console.log(`index.js : ${error}`)
+                res.status(401).json({
+                    statusCode: 401,
+                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
+                })
+                next(error)
+            }
+            if (result) {
+                console.log(`index.js: user successfully added!`)
+                res.status(200).json({
+                    statusCode: 200,
+                    result,
+                })
+            }
+        })        
+/*         let user = req.body;
     
         if (validEmail) {
           id++;
@@ -70,14 +87,20 @@ let controller = {
                 result: `Email ${user.emailAdress} already in use`,
             }
             next(error);
-        }
+        } */
     },
 
     getAllUsers:(req, res) => {
-        res.status(200).json({
+        database.listUsers((error, result) => {
+            res.status(200).json({
+                statusCode: 200,
+                result,
+            })
+        })
+/*         res.status(200).json({
             status: 200,
             result: database,
-          });
+          }); */
     },
 
     getUserProfile:(req, res) => {
@@ -88,7 +111,25 @@ let controller = {
     },
 
     getUserById:(req, res, next) => {
-        const userId = req.params.userId;
+        database.getUserById(req.params.userId, (error, result) => {
+            if (error) {
+                console.log(`index.js : ${error}`)
+                res.status(401).json({
+                    statusCode: 401,
+                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
+                })
+                next(error)
+            }
+            if (result) {
+                console.log(`index.js: user successfully added!`)
+                res.status(200).json({
+                    statusCode: 200,
+                    result,
+                })
+            }
+        })
+    },
+/*         const userId = req.params.userId;
         console.log(`User met ID ${userId} gezocht`);
         let user = database.filter((item) => item.id == userId);
         if (user.length > 0) {
@@ -102,10 +143,10 @@ let controller = {
                 result: `User with ID ${userId} not found`,
             }
             next(error);
-        }
-    },
+        } */
 
-    canUpdate:(req, res) => {
+
+/*     canUpdate:(req, res) => {
         let user = req.body;
         let validEmail = true;
 
@@ -116,10 +157,27 @@ let controller = {
                 validEmail = false;
             }
         });    
-    },
+    }, */
 
     updateUser:(req, res, next) => {
-        const userId = req.params.id;
+        database.updateUserById(req.params.userId, (error, result) => {
+            if (error) {
+                console.log(`index.js : ${error}`)
+                res.status(401).json({
+                    statusCode: 401,
+                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
+                })
+                next(error)
+            }
+            if (result) {
+                console.log(`index.js: user successfully updated!`)
+                res.status(200).json({
+                    statusCode: 200,
+                    result,
+                })
+            }
+        })
+/*         const userId = req.params.id;
         let user = req.body;
     
         newUser = {
@@ -148,11 +206,29 @@ let controller = {
                 result: `User with ID ${userId} not found`,
             }
             next(error);
-        }
+        } */
     },
 
     deleteUser:(req, res, next) => {
-        const userId = Number(req.params.userId);
+        database.deleteUserById(req.params.userId, (error, result) => {
+            if (error) {
+                console.log(`index.js : ${error}`)
+                res.status(401).json({
+                    statusCode: 401,
+                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
+                })
+                next(error)
+            }
+            if (result) {
+                console.log(`index.js: user successfully deleted!`)
+                res.status(200).json({
+                    statusCode: 200,
+                    result,
+                })
+            }
+        })
+
+/*         const userId = Number(req.params.userId);
         let user = database.filter((item) => item.id === userId);
     
         if (user.length > 0) {
@@ -169,7 +245,7 @@ let controller = {
                 result: `User with ID ${userId} not found`,
             }
             next(error);
-        }
+        } */
     }
 }
 
