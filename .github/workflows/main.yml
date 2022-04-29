@@ -16,4 +16,4 @@ jobs:
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: share-a-meal-j
-          heroku_email: jay.vanbezooijen@student.avans.nl
+          heroku_email: ${{secrets.HEROKU_USER_EMAIL}}
