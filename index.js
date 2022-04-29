@@ -4,11 +4,7 @@ const port = process.env.PORT || 3000;
 
 const bodyParser = require("body-parser");
 const userRouter = require('./routes/user.routes');
-
 app.use(bodyParser.json());
-
-let database = [];
-let id = 0;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
