@@ -1,10 +1,12 @@
 const assert = require('assert');
-const database = require('../../database/inmemdb')
+// const database = require('../../database/inmemdb')
+let database = [];
+const dbconnection = require('../../database/dbconnection')
 let id = 0;
 let validEmail = true;
 
 let controller = {
-/*     validateEmail:(req, res, next) =>{
+    validateEmail:(req, res, next) =>{
         let user = req.body;
 
         database.forEach((u) => {
@@ -13,7 +15,7 @@ let controller = {
             }
         });  
         next();
-    }, */
+    },
 
     validateUser:(req, res, next) => {
         let user = req.body;
@@ -48,7 +50,7 @@ let controller = {
     },
 
     addUser:(req, res, next) => {
-        database.addUser(req.body, (error, result) => {
+/*         database.addUser(req.body, (error, result) => {
             if (error) {
                 console.log(`index.js : ${error}`)
                 res.status(401).json({
@@ -64,8 +66,8 @@ let controller = {
                     result,
                 })
             }
-        })        
-/*         let user = req.body;
+        })   */      
+        let user = req.body;
     
         if (validEmail) {
           id++;
@@ -87,20 +89,34 @@ let controller = {
                 result: `Email ${user.emailAdress} already in use`,
             }
             next(error);
-        } */
+        }
     },
 
     getAllUsers:(req, res) => {
-        database.listUsers((error, result) => {
-            res.status(200).json({
-                statusCode: 200,
-                result,
-            })
-        })
-/*         res.status(200).json({
-            status: 200,
-            result: database,
-          }); */
+        dbconnection.getConnection(function(err, connection) {
+            if (err) throw err; // not connected!
+           
+            // Use the connection
+            connection.query('SELECT name, id FROM meal', function (error, results, fields) {
+              // When done with the connection, release it.
+              connection.release();
+           
+              // Handle error after the release.
+              if (error) throw error;
+           
+              // Don't use the connection here, it has been returned to the pool.
+              console.log('#results = ', results.length)
+              res.status(200).json({
+                  statusCode: 200,
+                  results: results
+              })
+        
+/*             dbconnection.end((err) => {
+                console.log('pool was closed.')
+            }); */
+        
+            });
+        });
     },
 
     getUserProfile:(req, res) => {
@@ -111,7 +127,7 @@ let controller = {
     },
 
     getUserById:(req, res, next) => {
-        database.getUserById(req.params.userId, (error, result) => {
+/*         database.getUserById(req.params.userId, (error, result) => {
             if (error) {
                 console.log(`index.js : ${error}`)
                 res.status(401).json({
@@ -127,9 +143,9 @@ let controller = {
                     result,
                 })
             }
-        })
-    },
-/*         const userId = req.params.userId;
+        }) */
+
+        const userId = req.params.userId;
         console.log(`User met ID ${userId} gezocht`);
         let user = database.filter((item) => item.id == userId);
         if (user.length > 0) {
@@ -143,12 +159,12 @@ let controller = {
                 result: `User with ID ${userId} not found`,
             }
             next(error);
-        } */
+        }
+    },
 
 
-/*     canUpdate:(req, res) => {
+    canUpdate:(req, res) => {
         let user = req.body;
-        let validEmail = true;
 
         const otherUsers = database.filter((item) => item.id !== user.id);
     
@@ -157,10 +173,10 @@ let controller = {
                 validEmail = false;
             }
         });    
-    }, */
+    },
 
     updateUser:(req, res, next) => {
-        database.updateUserById(req.params.userId, (error, result) => {
+/*         database.updateUserById(req.params.userId, (error, result) => {
             if (error) {
                 console.log(`index.js : ${error}`)
                 res.status(401).json({
@@ -176,8 +192,8 @@ let controller = {
                     result,
                 })
             }
-        })
-/*         const userId = req.params.id;
+        }) */
+        const userId = req.params.id;
         let user = req.body;
     
         newUser = {
@@ -206,11 +222,11 @@ let controller = {
                 result: `User with ID ${userId} not found`,
             }
             next(error);
-        } */
+        }
     },
 
     deleteUser:(req, res, next) => {
-        database.deleteUserById(req.params.userId, (error, result) => {
+/*         database.deleteUserById(req.params.userId, (error, result) => {
             if (error) {
                 console.log(`index.js : ${error}`)
                 res.status(401).json({
@@ -226,9 +242,9 @@ let controller = {
                     result,
                 })
             }
-        })
+        }) */
 
-/*         const userId = Number(req.params.userId);
+        const userId = Number(req.params.userId);
         let user = database.filter((item) => item.id === userId);
     
         if (user.length > 0) {
@@ -245,7 +261,7 @@ let controller = {
                 result: `User with ID ${userId} not found`,
             }
             next(error);
-        } */
+        }
     }
 }
 
