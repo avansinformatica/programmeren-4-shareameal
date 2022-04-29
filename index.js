@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;
+require("dotenv").config();
+const port = process.env.PORT;
 const bodyParser = require("body-parser");
 const userRouter = require("./src/routes/user.routes");
 const res = require("express/lib/response");
@@ -13,7 +14,7 @@ app.all("*", (req, res, next) => {
   next();
 });
 
-app.use(userRouter);
+app.use(userRouter); //app.use("/api", userRoutes);
 
 app.all("*", (req, res) => {
   res.status(401).json({
@@ -24,7 +25,7 @@ app.all("*", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  res.status(err.status).json(err);
+  res.status(500).json(err);
 });
 
 app.listen(port, () => {
