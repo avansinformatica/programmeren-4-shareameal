@@ -7,12 +7,13 @@
 -- 
 DROP DATABASE IF EXISTS `share-a-meal`;
 CREATE DATABASE `share-a-meal`;
--- DROP DATABASE IF EXISTS `share-a-meal_testdb`;
--- CREATE DATABASE `share-a-meal_testdb`;
+DROP DATABASE IF EXISTS `share-a-meal-testdb`;
+CREATE DATABASE `share-a-meal-testdb`;
 -- share-a-meal-user aanmaken
 CREATE USER 'share-a-meal-user'@'localhost' IDENTIFIED BY 'secret';
 CREATE USER 'share-a-meal-user'@'%' IDENTIFIED BY 'secret';
 -- geef rechten aan deze user
 GRANT SELECT, INSERT, DELETE, UPDATE ON `share-a-meal`.* TO 'share-a-meal-user'@'%';
+GRANT SELECT, INSERT, DELETE, UPDATE ON `share-a-meal-testdb`.* TO 'share-a-meal-user'@'%';
 
 USE `share-a-meal`;

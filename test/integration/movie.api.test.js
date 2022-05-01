@@ -1,3 +1,5 @@
+process.env.DB_DATABASE = process.env.DB_DATABASE || 'share-a-meal-testdb'
+
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const server = require('../../index')
@@ -7,6 +9,31 @@ const dbconnection = require('../../database/dbconnection')
 
 chai.should()
 chai.use(chaiHttp)
+
+/**
+ * Db queries to clear and fill the test database before each test.
+ */
+const CLEAR_MEAL_TABLE = 'DELETE IGNORE FROM `meal`;'
+const CLEAR_PARTICIPANTS_TABLE = 'DELETE IGNORE FROM `meal_participants_user`;'
+const CLEAR_USERS_TABLE = 'DELETE IGNORE FROM `user`;'
+const CLEAR_DB = CLEAR_MEAL_TABLE + CLEAR_PARTICIPANTS_TABLE + CLEAR_USERS_TABLE
+
+/**
+ * Voeg een user toe aan de database. Deze user heeft id 1.
+ * Deze id kun je als foreign key gebruiken in de andere queries, bv insert studenthomes.
+ */
+const INSERT_USER =
+    'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
+    '(1, "first", "last", "name@server.nl", "secret", "street", "city");'
+
+/**
+ * Query om twee meals toe te voegen. Let op de UserId, die moet matchen
+ * met de user die je ook toevoegt.
+ */
+const INSERT_MEALS =
+    'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
+    "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
+    "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);"
 
 describe('Movies API', () => {
     //
@@ -31,7 +58,7 @@ describe('Movies API', () => {
 
                 // Use the connection
                 connection.query(
-                    'SELECT id, name FROM meal;',
+                    CLEAR_DB + INSERT_USER,
                     function (error, results, fields) {
                         // When done with the connection, release it.
                         connection.release()
@@ -49,8 +76,6 @@ describe('Movies API', () => {
         it('TC-201-1 should return valid error when required value is not present', (done) => {
             chai.request(server)
                 .post('/api/movie')
-                // Hier gebruiken we de synchrone jwt.sign om een token te krijgen
-                // zodat we simuleren dat we als user met id=1 ingelogd zijn
                 .send({
                     // name is missing
                     year: 1234,
@@ -80,6 +105,52 @@ describe('Movies API', () => {
             done()
         })
 
+        // En hier komen meer testcases
+    })
+
+    describe('UC-303 Lijst van maaltijden opvragen /api/meal', () => {
+        //
+        beforeEach((done) => {
+            console.log('beforeEach called')
+            // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+                connection.query(
+                    CLEAR_DB + INSERT_USER + INSERT_MEALS,
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        console.log('beforeEach done')
+                        done()
+                    }
+                )
+            })
+        })
+
+        it('TC-303-1 Lijst van maaltijden wordt succesvol geretourneerd', (done) => {
+            chai.request(server)
+                .get('/api/movie')
+                .end((err, res) => {
+                    assert.ifError(err)
+
+                    res.should.have.status(200)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('results', 'statusCode')
+
+                    let { statusCode, results } = res.body
+                    statusCode.should.be.an('number')
+                    results.should.be.an('array').that.has.length(2)
+                    results[0].name.should.equal('Meal A')
+                    results[0].id.should.equal(1)
+                    done()
+                })
+        })
         // En hier komen meer testcases
     })
 })
