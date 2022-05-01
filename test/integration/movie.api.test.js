@@ -6,7 +6,7 @@ const assert = require('assert')
 chai.should()
 chai.use(chaiHttp)
 
-console.log(`In movie.api.test: MYSQL_ROOT_PASSWORD = ${MYSQL_ROOT_PASSWORD}`)
+console.log(`In movie.api.test: DB_PASSWORD = ${process.env.DB_PASSWORD}`)
 
 describe('Movies API', () => {
     describe('UC201 Create movie', () => {

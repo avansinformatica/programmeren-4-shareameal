@@ -9,7 +9,7 @@ jobs:
     integrationtests:
         runs-on: ubuntu-latest
         env:
-            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: verysecret
         strategy:
             matrix:
                 node-version: ['16.x']
@@ -22,6 +22,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Set up MySQL 5.7
+              # https://github.com/mirromutth/mysql-action/blob/master/README.md
               uses: mirromutth/mysql-action@master
               with:
                   mysql database: 'share-a-meal' # Optional, default value is "test". The specified database which will be create
@@ -31,7 +32,7 @@ jobs:
             - name: npm install and test
               run: |
                   npm install
-                  npm test -- --password=$MYSQL_ROOT_PASSWORD
+                  npm test -- --DB_PASSWORD=$MYSQL_ROOT_PASSWORD
               env:
                   CI: true
 
