@@ -9,6 +9,8 @@ chai.use(chaiHttp)
 
 console.log(`--DB_PASSWORD = ${process.env.npm_config_DB_PASSWORD}`)
 console.log(`--DB_PASSWORD = ${process.env.DB_PASSWORD}`)
+console.log(`--DB_NAME = ${process.env.npm_config_DB_NAME}`)
+console.log(`--DB_NAME = ${process.env.DB_NAME}`)
 
 describe('Movies API', () => {
     describe('UC201 Create movie', () => {
