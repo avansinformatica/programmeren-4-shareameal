@@ -3,6 +3,7 @@ const chaiHttp = require('chai-http')
 const server = require('../../index')
 const assert = require('assert')
 require('dotenv').config()
+const dbconnection = require('../../database/dbconnection')
 
 chai.should()
 chai.use(chaiHttp)
@@ -16,8 +17,23 @@ describe('Movies API', () => {
     describe('UC201 Create movie', () => {
         beforeEach((done) => {
             // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
-            // ToDo
-            done()
+            dbconnection.getConnection(function (err, connection) {
+                if (err) throw err // not connected!
+
+                // Use the connection
+                connection.query(
+                    'SELECT id, name FROM meal;',
+                    function (error, results, fields) {
+                        // When done with the connection, release it.
+                        connection.release()
+
+                        // Handle error after the release.
+                        if (error) throw error
+                        // Let op dat je done() pas aanroept als de query callback eindigt!
+                        done()
+                    }
+                )
+            })
         })
 
         it('TC-201-1 should return valid error when required value is not present', (done) => {

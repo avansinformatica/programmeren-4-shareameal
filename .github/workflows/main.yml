@@ -10,10 +10,14 @@ jobs:
         runs-on: ubuntu-latest
         env:
             MYSQL_ROOT_PASSWORD: verysecret
-            DB_NAME: share-a-meal
+            DB_HOST: localhost
+            DB_PORT: 3306
+            DB_NAME: s_a_m
+            DB_USER: sam_user
+            DB_PASSWORD: $MYSQL_ROOT_PASSWORD
         strategy:
             matrix:
-                node-version: ['16.x']
+                node-version: ['14.x', '16.x']
         steps:
             - uses: actions/checkout@v2
 
@@ -31,8 +35,8 @@ jobs:
               with:
                   mysql database: ${{env.DB_NAME}} # Optional, default value is "test". The specified database which will be create
                   mysql root password: ${{env.MYSQL_ROOT_PASSWORD}} # Required if "mysql user" is empty, default is empty. The root superuser password
-                  mysql user: 's-a-m-user' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-                  mysql password: ${{env.MYSQL_ROOT_PASSWORD}} # Required if "mysql user" exists. The password for the "mysql user"                  mysql root password: ${{MYSQL_ROOT_PASSWORD}}
+                  mysql user: ${{env.DB_USER}} # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+                  mysql password: ${{env.DB_PASSWORD}} # Required if "mysql user" exists. The password for the "mysql user"                  mysql root password: ${{MYSQL_ROOT_PASSWORD}}
 
             - name: npm install
               run: |
@@ -40,7 +44,7 @@ jobs:
 
             - name: npm test
               run: |
-                  npm test -- --DB_PASSWORD ${{env.MYSQL_ROOT_PASSWORD}} --DB_NAME $DB_NAME
+                  npm test -- --DB_PASSWORD $DB_PASSWORD --DB_USER $DB_USER --DB_NAME $DB_NAME
 
     deploy:
         needs: integrationtests
