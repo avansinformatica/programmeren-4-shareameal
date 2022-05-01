@@ -8,12 +8,12 @@ on:
 jobs:
     integrationtests:
         runs-on: ubuntu-latest
+        env:
+            MYSQL_ROOT_PASSWORD: secret
         strategy:
             matrix:
                 node-version: ['16.x']
-
         steps:
-            # Checkout the Repo
             - uses: actions/checkout@v2
             - name: Shutdown Ubuntu MySQL (SUDO)
               run: sudo service mysql stop
@@ -26,11 +26,11 @@ jobs:
               with:
                   mysql version: 5.7
                   mysql database: test
-                  mysql root password: ${{ secrets.DatabasePassword }}
+                  mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
             - name: npm install and test
               run: |
                   npm install
-                  npm test -- --password=${{ secrets.DatabasePassword }}
+                  npm test -- --password=${{ secrets.MYSQL_ROOT_PASSWORD }}
               env:
                   CI: true
 
