@@ -15,27 +15,30 @@ jobs:
                 node-version: ['16.x']
         steps:
             - uses: actions/checkout@v2
+
             - name: Shutdown Ubuntu MySQL (SUDO)
               run: sudo service mysql stop
+
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
+
             - name: Set up MySQL 5.7
               env:
-                  CI: true
                   DB_NAME: share-a-meal
               # https://github.com/mirromutth/mysql-action/blob/master/README.md
               uses: mirromutth/mysql-action@master
               with:
-                  mysql database: $DB_NAME # Optional, default value is "test". The specified database which will be create
-                  mysql root password: $MYSQL_ROOT_PASSWORD # Required if "mysql user" is empty, default is empty. The root superuser password
+                  mysql database: ${{env.DB_NAME}} # Optional, default value is "test". The specified database which will be create
+                  mysql root password: ${{env.MYSQL_ROOT_PASSWORD}} # Required if "mysql user" is empty, default is empty. The root superuser password
                   mysql user: 's-a-m-user' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-                  mysql password: $MYSQL_ROOT_PASSWORD # Required if "mysql user" exists. The password for the "mysql user"                  mysql root password: $MYSQL_ROOT_PASSWORD
+                  mysql password: ${{env.MYSQL_ROOT_PASSWORD}} # Required if "mysql user" exists. The password for the "mysql user"                  mysql root password: ${{MYSQL_ROOT_PASSWORD}}
+
             - name: npm install and test
               run: |
                   npm install
-                  npm test -- --DB_PASSWORD=$MYSQL_ROOT_PASSWORD
+                  npm test -- --DB_PASSWORD=${{env.MYSQL_ROOT_PASSWORD}}
 
     deploy:
         needs: integrationtests
