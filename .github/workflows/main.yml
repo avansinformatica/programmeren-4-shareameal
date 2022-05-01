@@ -35,10 +35,13 @@ jobs:
                   mysql user: 's-a-m-user' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
                   mysql password: ${{env.MYSQL_ROOT_PASSWORD}} # Required if "mysql user" exists. The password for the "mysql user"                  mysql root password: ${{MYSQL_ROOT_PASSWORD}}
 
-            - name: npm install and test
+            - name: npm install
               run: |
                   npm install
-                    #   npm test -- --DB_PASSWORD=${{env.MYSQL_ROOT_PASSWORD}}
+
+            - name: npm test
+              run: |
+                  #   npm test -- --DB_PASSWORD=${{env.MYSQL_ROOT_PASSWORD}}
                   npm --DB_PASSWORD=${{env.MYSQL_ROOT_PASSWORD}} run test
 
     deploy:
