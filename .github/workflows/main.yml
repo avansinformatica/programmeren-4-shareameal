@@ -25,13 +25,13 @@ jobs:
               uses: mirromutth/mysql-action@master
               with:
                   mysql database: 'share-a-meal' # Optional, default value is "test". The specified database which will be create
-                  mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }} # Required if "mysql user" is empty, default is empty. The root superuser password
+                  mysql root password: $MYSQL_ROOT_PASSWORD # Required if "mysql user" is empty, default is empty. The root superuser password
                   mysql user: 's-a-m-user' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-                  mysql password: ${{ secrets.MYSQL_ROOT_PASSWORD }} # Required if "mysql user" exists. The password for the "mysql user"                  mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+                  mysql password: $MYSQL_ROOT_PASSWORD # Required if "mysql user" exists. The password for the "mysql user"                  mysql root password: $MYSQL_ROOT_PASSWORD
             - name: npm install and test
               run: |
                   npm install
-                  npm test -- --password=${{ secrets.MYSQL_ROOT_PASSWORD }}
+                  npm test -- --password=$MYSQL_ROOT_PASSWORD
               env:
                   CI: true
 
