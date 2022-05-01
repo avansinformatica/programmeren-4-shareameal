@@ -8,21 +8,31 @@ on:
 jobs:
     integrationtests:
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: ['16.x']
+
         steps:
             # Checkout the Repo
             - uses: actions/checkout@v2
-
-            # Install Node 16
-            - name: Setup Node
+            - name: Shutdown Ubuntu MySQL (SUDO)
+              run: sudo service mysql stop
+            - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
-                  node-version: 16
-
-            # Install dependencies
-            - run: npm install
-
-            # Run tests
-            - run: npm test
+                  node-version: ${{ matrix.node-version }}
+            - name: Set up MySQL 5.7
+              uses: mirromutth/mysql-action@master
+              with:
+                  mysql version: 5.7
+                  mysql database: test
+                  mysql root password: ${{ secrets.DatabasePassword }}
+            - name: npm install and test
+              run: |
+                  npm install
+                  npm test -- --password=${{ secrets.DatabasePassword }}
+              env:
+                  CI: true
 
     deploy:
         needs: integrationtests
