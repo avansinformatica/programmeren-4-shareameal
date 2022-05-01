@@ -38,7 +38,8 @@ jobs:
             - name: npm install and test
               run: |
                   npm install
-                  npm test -- --DB_PASSWORD=${{env.MYSQL_ROOT_PASSWORD}}
+                    #   npm test -- --DB_PASSWORD=${{env.MYSQL_ROOT_PASSWORD}}
+                  npm --DB_PASSWORD=${{env.MYSQL_ROOT_PASSWORD}} run test
 
     deploy:
         needs: integrationtests

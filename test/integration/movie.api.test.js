@@ -7,7 +7,9 @@ require('dotenv').config()
 chai.should()
 chai.use(chaiHttp)
 
-console.log(`In movie.api.test: DB_PASSWORD = ${process.env.DB_PASSWORD}`)
+console.log(
+    `In movie.api.test: DB_PASSWORD = ${process.env.npm_config_DB_PASSWORD}`
+)
 
 describe('Movies API', () => {
     describe('UC201 Create movie', () => {
