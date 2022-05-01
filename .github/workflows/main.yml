@@ -30,7 +30,7 @@ jobs:
               run: |
                   sudo /etc/init.d/mysql start
                   sudo apt-get install -y mysql-client
-                  mysql --host=mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} -e "SHOW DATABASES;"
+                  mysql --host=${{DB_HOST}} -uroot -p${{env.MYSQL_ROOT_PASSWORD}} -e "SHOW DATABASES;"
                   mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -uroot -p${{ env.MYSQL_ROOT_PASSWORD }}
 
             - name: Import the database
