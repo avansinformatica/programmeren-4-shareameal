@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             MYSQL_ROOT_PASSWORD: secret
-            DB_HOST: localhost
+            DB_HOST: 127.0.0.1
             DB_PORT: 3306
             DB_DATABASE: share-a-meal
             DB_USER: sam_user
@@ -18,10 +18,10 @@ jobs:
         services:
             mysql:
                 image: mysql:5.7
-                # # env:
-                # #     MYSQL_ROOT_PASSWORD: password
-                # # ports:
-                # #     - 32574:3306
+                env:
+                    MYSQL_ROOT_PASSWORD: secret
+                ports:
+                    - 3306:3306
                 # options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
         steps:
             - uses: actions/checkout@v2
@@ -31,7 +31,9 @@ jobs:
                   sudo apt-get install -y mysql-client
                   #   mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
                   mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -uroot -p${{ env.MYSQL_ROOT_PASSWORD }}
-                  # mysql -h ${{env.DB_HOST}} --port 3306 -uroot -p${{env.MYSQL_ROOT_PASSWORD}} -e "CREATE DATABASE share-a-meal;"
+
+            - name: Import the database
+              run: |
                   mysql -h ${{env.DB_HOST}} --port 3306 -uroot -p${{env.MYSQL_ROOT_PASSWORD}} < share-a-meal.create.sql
                   mysql -h ${{env.DB_HOST}} --port 3306 -uroot -p${{env.MYSQL_ROOT_PASSWORD}} share-a-meal -e "SHOW TABLES;"
 
