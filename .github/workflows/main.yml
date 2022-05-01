@@ -19,10 +19,12 @@ jobs:
         services:
             mysql:
                 image: mysql:5.7
-                # env:
-                #     MYSQL_ROOT_PASSWORD: secret
+                env:
+                    # MYSQL_ROOT_PASSWORD: secret
+                    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+                    # MYSQL_DATABASE: laravel_tags
                 ports:
-                    - 3306:3306
+                    - 3306
                 # options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
         steps:
             - uses: actions/checkout@v2
@@ -30,8 +32,9 @@ jobs:
               run: |
                   sudo /etc/init.d/mysql start
                   sudo apt-get install -y mysql-client
-                  mysql --host=$DB_HOST -uroot -p${{env.MYSQL_ROOT_PASSWORD}} -e "SHOW DATABASES;"
-                  mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -uroot -p${{ env.MYSQL_ROOT_PASSWORD }}
+                  # mysql --host=$DB_HOST -uroot -p${{env.MYSQL_ROOT_PASSWORD}} -e "SHOW DATABASES;"
+                  mysql -uroot -e "SHOW DATABASES;"
+                  mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -uroot
 
             - name: Import the database
               run: |
