@@ -12,9 +12,9 @@ jobs:
             MYSQL_ROOT_PASSWORD: verysecret
             DB_HOST: localhost
             DB_PORT: 3306
-            DB_NAME: s_a_m
+            DB_DATABASE: s_a_m
             DB_USER: sam_user
-            DB_PASSWORD: $MYSQL_ROOT_PASSWORD
+            DB_PASSWORD: ${{env.MYSQL_ROOT_PASSWORD}}
         strategy:
             matrix:
                 node-version: ['14.x', '16.x']
