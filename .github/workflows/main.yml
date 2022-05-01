@@ -10,25 +10,20 @@ jobs:
         runs-on: ubuntu-latest
         env:
             MYSQL_ROOT_PASSWORD: root # default root password to use must be 'root'
-            # MYSQL_DATABASE: GitLab_MySql_database
             DB_HOST: localhost
             DB_PORT: 3306
             DB_DATABASE: share_a_meal
-            DB_USER: sam_user
-            DB_PASSWORD: secret
+            DB_USER: root
+            DB_PASSWORD: root
         services:
             mysql:
                 image: mysql:5.7
-                # env:
-                # MYSQL_ROOT_PASSWORD: secret
-                # MYSQL_ALLOW_EMPTY_PASSWORD: yes
-                # MYSQL_DATABASE: laravel_tags
                 ports:
                     - 3306
-                # options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
         steps:
             - uses: actions/checkout@v2
-            - name: Verify MySQL connection from host
+
+            - name: Start MySQL connection from host
               run: |
                   sudo /etc/init.d/mysql start
                   sudo apt-get install -y mysql-client
@@ -46,7 +41,7 @@ jobs:
 
             - name: npm test
               run: |
-                  npm test -- --DB_PASSWORD $MYSQL_ROOT_PASSWORD --DB_USER root --DB_NAME $DB_NAME
+                  npm test -- --DB_PASSWORD $MYSQL_ROOT_PASSWORD --DB_USER root --DB_NAME $DB_DATABASE
 
     deploy:
         needs: integrationtests
