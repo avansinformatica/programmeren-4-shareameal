@@ -11,7 +11,6 @@ jobs:
         env:
             MYSQL_ROOT_PASSWORD: secret
             MYSQL_DATABASE: GitLab_MySql_database
-            MYSQL_ROOT_PASSWORD: some_secret_password
             DB_HOST: localhost
             DB_PORT: 3306
             DB_DATABASE: share-a-meal
