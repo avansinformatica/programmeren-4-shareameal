@@ -51,6 +51,7 @@ module.exports = {
     },
 
     getAll: (req, res, next) => {
+        console.log('getAll aangeroepen')
         dbconnection.getConnection(function (err, connection) {
             if (err) throw err // not connected!
 
@@ -70,9 +71,6 @@ module.exports = {
                         statusCode: 200,
                         results: results,
                     })
-                    // pool.end((err) => {
-                    //     console.log('pool was closed.')
-                    // })
                 }
             )
         })
