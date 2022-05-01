@@ -9,8 +9,22 @@ chai.should()
 chai.use(chaiHttp)
 
 describe('Movies API', () => {
+    //
+    // informatie over before, after, beforeEach, afterEach:
+    // https://mochajs.org/#hooks
+    //
+    before((done) => {
+        console.log(
+            'before: hier zorg je eventueel dat de precondities correct zijn'
+        )
+        console.log('before done')
+        done()
+    })
+
     describe('UC201 Create movie', () => {
+        //
         beforeEach((done) => {
+            console.log('beforeEach called')
             // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
             dbconnection.getConnection(function (err, connection) {
                 if (err) throw err // not connected!
@@ -25,6 +39,7 @@ describe('Movies API', () => {
                         // Handle error after the release.
                         if (error) throw error
                         // Let op dat je done() pas aanroept als de query callback eindigt!
+                        console.log('beforeEach done')
                         done()
                     }
                 )
