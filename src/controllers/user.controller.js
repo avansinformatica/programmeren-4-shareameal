@@ -56,13 +56,24 @@ let controller = {
       });
     },
 
-    //validateUser UC-203
+    //UC-203?? -- "/api/user/profile" nog niet gerealiseerd (zie routes)
+
+    //validateUser
   validateUser: (req, res, next) => {
     let user = req.body;
-    let { firstName, lastName, emailAdress, password } = user;
+    let { firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber } = user;
     try {
       assert(typeof firstName === "string", "First Name must be a string");
       assert(typeof lastName === "string", "Last Name must be a string");
+      assert(typeof street === "string", "Street must be a string");
+      assert(typeof city === "string", "City must be a string");
+      assert(typeof isActive === "boolean", "Is Active must be a boolean");
+      assert(typeof emailAdress === "string", "Email Address must be a string");
+      assert(typeof password === "string", "Password must be a string");
+      assert(typeof phoneNumber === "string", "phoneNumber must be a string");
+
+      let isUnique;
+      //als in database al een zelfde emailAddress staat -> error
 
       next();
     } catch (err) {

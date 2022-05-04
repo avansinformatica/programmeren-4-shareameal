@@ -13,6 +13,7 @@ router.get("/", (req, res) => {
 });
 
 // IN CONTROLLER UC-201 Register as a new user
+// LOOK HERE hier is validatie
 router.post("/api/user", userController.validateUser, userController.addUser);
 
 // IN CONTROLLER UC-202 Get all users
