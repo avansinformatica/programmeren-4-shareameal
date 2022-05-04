@@ -15,6 +15,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use(userRouter); //app.use("/api", userRoutes);
+//app.use(mealRouter); //app.use("/api", mealRoutes);
 
 app.all("*", (req, res) => {
   res.status(401).json({

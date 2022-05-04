@@ -12,29 +12,16 @@ router.get("/", (req, res) => {
   });
 });
 
-// IN CONTROLLER
-// UC-201 Register as a new user
-//    - emailAdress is uniek
-//    - Error response: als emailAdress niet
-//      uniek: user is niet toegevoegd in
-//      database statusCode + message
-//      geretourneerd
-//    - Succes response: user is toegevoegd
-//      in database, userdata inclusief id
-//      wordt geretourneerd.
+// IN CONTROLLER UC-201 Register as a new user
 router.post("/api/user", userController.validateUser, userController.addUser);
 
-// IN CONTROLLER
-// UC-202 Get all users
-//    - Succes response: code 200 result:
-//      result: nul of meer userobjecten
-//      in een array
+// IN CONTROLLER UC-202 Get all users
 router.get("/api/user", userController.getAllUsers);
 
-// IN CONTROLLER
-// UC-204 Get singel user by ID
+// IN CONTROLLER UC-204 Get singel user by ID
 router.get("/api/user/:userId", userController.getUserById);
 
+// NOT! IN CONTROLLER YET!!!!!!!!!!!!
 // UC-203 Request personal user profile
 //    de user is ingelogd, het request bevat
 //    een JWT met userId
@@ -47,54 +34,12 @@ router.get("/api/user/profile", (req, res, next) => {
   });
 });
 
+// IN CONTROLLER
 // UC-205 Update a single user
-router.put("/api/user/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  console.log(`User met ID ${userId} wordt gezocht`);
-  let user = database.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    let databaseT = database.splice(userId);
-    database = databaseT;
+router.put("/api/user/:userId", userController.updateSingleUser);
 
-    let user = req.body;
-    id++;
-    user = {
-      id,
-      ...user,
-    };
-    console.log(user);
-    database.push(user);
-
-    res.status(200).json({
-      status: 200,
-      result: database,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not found`,
-    });
-  }
-});
-
+// IN CONTROLLER
 // UC-206 Delete a user
-router.delete("/api/user/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
-  let user = database.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    let databaseT = database.splice(userId);
-    database = databaseT;
-    res.status(200).json({
-      status: 200,
-      result: database,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `User with ID ${userId} not found`,
-    });
-  }
-});
+router.delete("/api/user/:userId", userController.deleteSingleUser);
 
 module.exports = router;
