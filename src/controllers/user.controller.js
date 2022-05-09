@@ -86,7 +86,7 @@ let controller = {
         } else {
             const error = {
                 status: 400,
-                result: `Email ${user.emailAdress} already in use`,
+                result: `Email is already in use`,
             }
             next(error);
         }
@@ -214,7 +214,7 @@ let controller = {
         } else if (selectedUser != null && !validEmail) {
           res.status(400).json({
           status: 400,
-          message: `Email ${newUser.emailAdress} is already in use.`,
+          message: `Email is already in use.`,
           });
         } else {
             const error = {

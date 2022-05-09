@@ -8,7 +8,7 @@ chai.should();
 chai.use(chaiHttp);
 
 describe('Manage users /api/user', () => {
-    describe('UC-201 add a user', () => {
+    describe('TC-201-1 add a user, all properties are required except id', () => {
         beforeEach((done) => {
             database = [];
             done();
@@ -155,8 +155,44 @@ describe('Manage users /api/user', () => {
                 })
         })
 
-        it('TC_202 Other test example', () => {
-            
+        it('TC_201-5 email adress is unique in database', (done) => {
+            chai.request(server)
+            .post('/api/user')
+            .send({
+                //Phone number missing
+                firstName: "John",
+                lastName: "Doe",
+                street: "Lovensdijkstraat 61",
+                city: "Breda",
+                emailAdress: "j.doe@server.com",
+                password: "secret",
+                phoneNumber: "06 12425475",
+            })
+            .end((err, res) => {
+                res.should.be.an('object')
+                let {status, result} = res.body;
+                status.should.equals(201)
+            })
+
+            chai.request(server)
+            .post('/api/user')
+            .send({
+                //Phone number missing
+                firstName: "John",
+                lastName: "Doe",
+                street: "Lovensdijkstraat 61",
+                city: "Breda",
+                emailAdress: "j.doe@server.com",
+                password: "secret",
+                phoneNumber: "06 12425475",
+            })
+            .end((err, res) => {
+                res.should.be.an('object')
+                let {status, result} = res.body;
+                status.should.equals(400)
+                result.should.be.a('string').that.equals('Email is already in use');
+                done();
+            })
         })
     })
 })
