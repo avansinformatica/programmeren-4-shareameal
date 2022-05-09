@@ -50,46 +50,44 @@ let controller = {
     },
 
     addUser:(req, res, next) => {
-/*         database.addUser(req.body, (error, result) => {
-            if (error) {
-                console.log(`index.js : ${error}`)
-                res.status(401).json({
-                    statusCode: 401,
-                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
-                })
-                next(error)
-            }
-            if (result) {
-                console.log(`index.js: user successfully added!`)
-                res.status(200).json({
-                    statusCode: 200,
-                    result,
-                })
-            }
-        })   */      
-        let user = req.body;
-    
-        if (validEmail) {
-          id++;
-          user = {
-            id,
-            ...user,
-          };
-    
-          database.push(user);
-    
-          res.status(201).json({
-            status: 201,
-            result: database,
-          });
-    
-        } else {
-            const error = {
-                status: 400,
-                result: `Email is already in use`,
-            }
-            next(error);
-        }
+   
+        dbconnection.getConnection(function (err, connection) {
+            if (err) throw err;
+
+            let user = req.body;
+
+            connection.query(
+                'SELECT COUNT(emailAdress) as count FROM user WHERE emailAdress = ?',
+                user.emailAdress,
+                function (error, results, fields) {
+                    connection.release();
+
+                    if (error) throw error;
+
+                    if (results[0].count > 0) {
+                        res.status(409).json({
+                            status: 409,
+                            message: `Email is already in use.`,
+                        });
+                    }
+                });
+
+
+            connection.query(
+                `INSERT INTO user (firstName, lastName, street, city, password, emailAdress) VALUES ('${user.firstName}', '${user.lastName}', '${user.street}', '${user.city}', '${user.password}', '${user.emailAdress}')`,
+                function (error, results, fields) {
+                    connection.release();
+
+                    if (error) throw error;
+
+                    if (results.affectedRows > 0) {
+                        res.status(201).json({
+                            status: 201,
+                            result: results,
+                        });
+                    }
+                });
+        });
     },
 
     getAllUsers:(req, res) => {
@@ -97,7 +95,7 @@ let controller = {
             if (err)throw err; // not connected!
            
             // Use the connection
-            connection.query('SELECT firstName, lastName, id FROM user', function (error, results, fields) {
+            connection.query('SELECT * FROM user', function (error, results, fields) {
               // When done with the connection, release it.
               connection.release();
            
@@ -111,10 +109,6 @@ let controller = {
                   results: results
               })
         
-/*             dbconnection.end((err) => {
-                console.log('pool was closed.')
-            }); */
-        
             });
         });
     },
@@ -127,24 +121,6 @@ let controller = {
     },
 
     getUserById:(req, res, next) => {
-/*         database.getUserById(req.params.userId, (error, result) => {
-            if (error) {
-                console.log(`index.js : ${error}`)
-                res.status(401).json({
-                    statusCode: 401,
-                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
-                })
-                next(error)
-            }
-            if (result) {
-                console.log(`index.js: user successfully added!`)
-                res.status(200).json({
-                    statusCode: 200,
-                    result,
-                })
-            }
-        }) */
-
         const userId = req.params.userId;
         console.log(`User met ID ${userId} gezocht`);
         let user = database.filter((item) => item.id == userId);
@@ -176,23 +152,7 @@ let controller = {
     },
 
     updateUser:(req, res, next) => {
-/*         database.updateUserById(req.params.userId, (error, result) => {
-            if (error) {
-                console.log(`index.js : ${error}`)
-                res.status(401).json({
-                    statusCode: 401,
-                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
-                })
-                next(error)
-            }
-            if (result) {
-                console.log(`index.js: user successfully updated!`)
-                res.status(200).json({
-                    statusCode: 200,
-                    result,
-                })
-            }
-        }) */
+
         const userId = req.params.id;
         let user = req.body;
     
@@ -226,23 +186,6 @@ let controller = {
     },
 
     deleteUser:(req, res, next) => {
-/*         database.deleteUserById(req.params.userId, (error, result) => {
-            if (error) {
-                console.log(`index.js : ${error}`)
-                res.status(401).json({
-                    statusCode: 401,
-                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
-                })
-                next(error)
-            }
-            if (result) {
-                console.log(`index.js: user successfully deleted!`)
-                res.status(200).json({
-                    statusCode: 200,
-                    result,
-                })
-            }
-        }) */
 
         const userId = Number(req.params.userId);
         let user = database.filter((item) => item.id === userId);
