@@ -94,7 +94,7 @@ let controller = {
 
     getAllUsers:(req, res) => {
         dbconnection.getConnection(function(err, connection) {
-            if (err){ throw err}; // not connected!
+            if (err)throw err; // not connected!
            
             // Use the connection
             connection.query('SELECT name, id FROM meal', function (error, results, fields) {
