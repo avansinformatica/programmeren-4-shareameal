@@ -27,12 +27,12 @@ jobs:
               run: |
                   sudo /etc/init.d/mysql start
                   sudo apt-get install -y mysql-client
-                  mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
-                  mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.DB_DATABASE}};"
+                  mysql -uroot -e "SHOW DATABASES;"
+                  mysql -uroot  -e "CREATE DATABASE ${{env.DB_DATABASE}};"
             - name: Import the database
               run: |
-                  mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} < share-a-meal.sql
-                  mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} -e "SHOW TABLES;"
+                  mysql -uroot ${{env.DB_DATABASE}} < share-a-meal.sql
+                  mysql -uroot ${{env.DB_DATABASE}} -e "SHOW TABLES;"
             - name: npm install
               run: |
                   npm install
