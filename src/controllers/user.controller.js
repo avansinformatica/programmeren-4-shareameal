@@ -37,7 +37,7 @@ let controller = {
                 assert(typeof emailAdress === 'string', 'Email must be a string')
             }
             assert(typeof password === 'string', 'Password must be a string')
-            assert(typeof phoneNumber === 'string', 'Phonenumber must be a string')
+            // assert(typeof phoneNumber === 'string', 'Phonenumber must be a string')
 
         } catch (err) {
             const error = {
