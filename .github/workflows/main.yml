@@ -9,7 +9,6 @@ jobs:
     integrationtests:
         runs-on: ubuntu-latest
         env:
-            MYSQL_ROOT_PASSWORD: root
             DB_HOST: localhost
             DB_PORT: 3306
             DB_DATABASE: share-a-meal
@@ -28,7 +27,7 @@ jobs:
                   sudo /etc/init.d/mysql start
                   sudo apt-get install -y mysql-client
                   mysql -uroot -e "SHOW DATABASES;"
-                  mysql -uroot  -e "CREATE DATABASE ${{env.DB_DATABASE}};"
+                  mysql -uroot -e "CREATE DATABASE ${{env.DB_DATABASE}};"
             - name: Import the database
               run: |
                   mysql -uroot ${{env.DB_DATABASE}} < share-a-meal.sql
@@ -38,7 +37,7 @@ jobs:
                   npm install
             - name: npm test
               run: |
-                  npm test -- --DB_PASSWORD $MYSQL_ROOT_PASSWORD --DB_USER root --DB_NAME $DB_DATABASE
+                  npm test -- --DB_USER root --DB_NAME $DB_DATABASE
     deploy:
         needs: integrationtests
         runs-on: ubuntu-latest
