@@ -134,7 +134,7 @@ describe('Manage users /api/user', () => {
                     done();
                 })
         })
-        it('Phone number missing or invalid, return valid error', (done) => {
+/*         it('Phone number missing or invalid, return valid error', (done) => {
             chai.request(server)
                 .post('/api/user')
                 .send({
@@ -153,7 +153,7 @@ describe('Manage users /api/user', () => {
                     result.should.be.a('string').that.equals('Phonenumber must be a string');
                     done();
                 })
-        })
+        }) */
 
         it('TC_201-5 email adress is unique in database', (done) => {
             chai.request(server)
