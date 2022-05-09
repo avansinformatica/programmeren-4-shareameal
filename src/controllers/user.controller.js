@@ -74,6 +74,7 @@ let controller = {
 
       let isUnique;
       //als in database al een zelfde emailAddress staat -> error
+      //emailadress moet '@' teken bevatten en '.' teken bevatten
 
       next();
     } catch (err) {
@@ -133,7 +134,7 @@ let controller = {
         result: `User with ID ${userId} not found`,
       });
     }
-  }
+  },
 
     //deleteSingleUser UC-206
   deleteSingleUser: (req, res, next) => {
@@ -153,7 +154,9 @@ let controller = {
         result: `User with ID ${userId} not found`,
       });
     }
+
+
   }
-};
+}
 
 module.exports = controller;
