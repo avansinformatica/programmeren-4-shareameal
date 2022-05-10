@@ -25,7 +25,7 @@ let controller = {
   },
 
     //getAllUsers UC-202
-  getAllUsers: (req, res) => {
+  getAllUsers: (req, res, next) => {
       // res.status(200).json({
       //   status: 200,
       //   result: database,
@@ -75,6 +75,15 @@ let controller = {
       let isUnique;
       //als in database al een zelfde emailAddress staat -> error
       //emailadress moet '@' teken bevatten en '.' teken bevatten
+      function validateEmail(email) {
+          var re = /\S+@\S+\.\S+/;
+          return re.test(email);
+      }
+
+      assert(validateEmail(emailAdress), "Email Address must contain an @ symbol and a dot")
+
+      //password is correct
+      assert(password != "password", "Password is invalid");
 
       next();
     } catch (err) {
