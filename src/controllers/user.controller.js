@@ -43,10 +43,40 @@ let controller = {
         next();
     },
 
+    validateUserUpdate:(req, res, next) => {
+        let user = req.body;
+        let{firstName, 
+            lastName, 
+            street, 
+            city, 
+            emailAdress, 
+            password, 
+            phoneNumber} = user;
+
+    
+        try {
+
+            assert(typeof emailAdress === 'string', 'Email must be a string')
+
+        } catch (err) {
+            const error = {
+                status: 400,
+                result: err.message,
+            };
+            next(error)
+        }
+        next();
+    },
+
     userExists: (req, res, next) => {
         dbconnection.getConnection(function (err, connection) {
+            const id = req.params.userId;
+
+            if(isNaN(id)){ 
+                return next()
+            } 
             connection.query(
-                'SELECT COUNT(id) as Count FROM user WHERE id = ?', req.params.userId,
+                'SELECT COUNT(id) as count FROM user WHERE id = ?', `${id}`,
                 function (err, results, fields) {
 
                     if (err) throw err;
@@ -71,7 +101,7 @@ let controller = {
             let user = req.body;
 
             connection.query(
-                'SELECT COUNT(emailAdress) as Count FROM user WHERE emailAdress = ?', user.emailAdress,
+                'SELECT COUNT(emailAdress) as count FROM user WHERE emailAdress = ?', user.emailAdress,
                 function (error, results, fields) {
                     connection.release();
 
@@ -82,22 +112,26 @@ let controller = {
                             status: 409,
                             message: `Email is already in use.`,
                         });
-                    }
-                });
+                    } else {
+                        connection.query(
+                            `INSERT INTO user (firstName, lastName, street, city, password, emailAdress) VALUES ('${user.firstName}', '${user.lastName}', '${user.street}', '${user.city}', '${user.password}', '${user.emailAdress}')`,
+                            function (error, results, fields) {       
+                                if (error) throw error;
+                 //      Uncaught TypeError: Cannot read properties of undefined (reading 'id')
+                                if (results.affectedRows > 0) {
 
+                                connection.query("SELECT * FROM user WHERE emailAdress = ?", user.emailAdress, function(error, results, fields) {
+                                    if (error) throw error;
+                                    connection.release();
 
-            connection.query(
-                `INSERT INTO user (firstName, lastName, street, city, password, emailAdress) VALUES ('${user.firstName}', '${user.lastName}', '${user.street}', '${user.city}', '${user.password}', '${user.emailAdress}')`,
-                function (error, results, fields) {
-                    connection.release();
-
-                    if (error) throw error;
-
-                    if (results.affectedRows > 0) {
-                        res.status(201).json({
-                            status: 201,
-                            result: results,
-                        });
+                                    res.status(201).json({
+                                        status: 201,
+                                        result: results[0],
+                                    });
+                                })
+                                                          
+                                }
+                            });
                     }
                 });
         });
@@ -135,23 +169,36 @@ let controller = {
 
     getUserById:(req, res, next) => {
         console.log("getUserById reached");
-        dbconnection.getConnection(function (err, connection) {
-            if (err) throw err;
+        dbconnection.getConnection(function (error, connection) {
+            if (error) throw error;
 
             const userId = req.params.userId
 
-            connection.query( 'SELECT * FROM user WHERE id = ?', userId, function (error, results, fields) {
-                    connection.release();
+            if(isNaN(userId)) {
+                return next();
+            }
 
-                    if (error) throw error;
-
-                    console.log('#results = ', results.length);
-                    res.status(200).json({
-                        status: 200,
-                        result: results,
+            connection.query("SELECT COUNT(id) as count FROM user WHERE id =?", userId,  function (error, results, fields) {
+                if (error) throw error;
+                if(!results[0].count) {
+                    return next({
+                        status: 404,
+                        message: `User doesn't exist`,
                     });
-                });
-
+                } else {
+                    connection.query( 'SELECT * FROM user WHERE id = ?', userId, function (error, results, fields) {
+                        if (error) throw error;
+                        
+                        connection.release();
+    
+                        console.log('#results = ', results.length);
+                        res.status(200).json({
+                            status: 200,
+                            result: results,
+                        });
+                    });
+                }
+            });
         });
     },
 

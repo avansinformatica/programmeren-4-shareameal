@@ -20,10 +20,10 @@ router.get("/api/user", userController.getAllUsers);
 router.get("/api/user/profile", userController.getUserProfile);
 
 //UC-204 Get info of specific user 
-router.get("/api/user/:userId", userController.userExists, userController.getUserById);
+router.get("/api/user/:userId", userController.getUserById);
 
 //UC-205 Update a user
-router.put("/api/user/:id", userController.userExists, userController.validateUser, userController.updateUser);
+router.put("/api/user/:id", userController.userExists, userController.validateUserUpdate, userController.updateUser);
 
 //UC-206 Delete a user
 router.delete("/api/user/:userId", userController.userExists, userController.deleteUser);
