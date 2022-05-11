@@ -36,7 +36,7 @@ let controller = {
         } catch (err) {
             const error = {
                 status: 400,
-                result: err.message,
+                message: err.message,
             };
             next(error)
         }
@@ -61,7 +61,7 @@ let controller = {
         } catch (err) {
             const error = {
                 status: 400,
-                result: err.message,
+                message: err.message,
             };
             next(error)
         }
@@ -84,7 +84,7 @@ let controller = {
                     if (results[0].count === 0) {
                         res.status(400).json({
                             status: 400,
-                            message: "This user does not exist",
+                            message: "User does not exist",
                         });
                     } else {
                         next();
@@ -117,12 +117,17 @@ let controller = {
                             `INSERT INTO user (firstName, lastName, street, city, password, emailAdress) VALUES ('${user.firstName}', '${user.lastName}', '${user.street}', '${user.city}', '${user.password}', '${user.emailAdress}')`,
                             function (error, results, fields) {       
                                 if (error) throw error;
-                 //      Uncaught TypeError: Cannot read properties of undefined (reading 'id')
                                 if (results.affectedRows > 0) {
 
                                 connection.query("SELECT * FROM user WHERE emailAdress = ?", user.emailAdress, function(error, results, fields) {
                                     if (error) throw error;
                                     connection.release();
+
+                                    if (results[0].isActive === 1) {
+                                        results[0].isActive = true;
+                                    } else {
+                                        results[0].isActive = false;
+                                    }
 
                                     res.status(201).json({
                                         status: 201,
@@ -194,7 +199,7 @@ let controller = {
                         console.log('#results = ', results.length);
                         res.status(200).json({
                             status: 200,
-                            result: results,
+                            result: results[0],
                         });
                     });
                 }

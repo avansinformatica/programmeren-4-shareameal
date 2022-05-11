@@ -22,9 +22,9 @@ describe("Manage users /api/user", () => {
         })
         .end((req, res) => {
           res.should.be.an("object");
-          let { status, result } = res.body;
+          let { status, message } = res.body;
           status.should.equals(400);
-          result.should.be
+          message.should.be
             .a("string")
             .that.equals("First name must be a string");
           done();
@@ -250,9 +250,9 @@ describe("Manage users /api/user", () => {
           city: "Amsterdam",
         })
         .end((req, res) => {
-          let { status, result } = res.body;
+          let { status, message } = res.body;
           status.should.equals(400);
-          result.should.be
+          message.should.be
             .a("string")
             .that.equals("Email must be a string");
           done();
