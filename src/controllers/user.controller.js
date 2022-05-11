@@ -11,17 +11,26 @@ let controller = {
     //addUser UC-201
   addUser: (req, res) => {
   //TODO check if user exists
-    let user = req.body;
-    id++;
-    user = {
-      id,
-      ...user,
-    };
-    database.push(user);
-    res.status(201).json({
-      status: 201,
-      result: database,
-    });
+    const userId = req.params.userId;
+    console.log(`User met ID ${userId} gezocht`);
+    let user = database.findIndex((item) => item.id == userId);
+        if (user >= 0) {
+          id++;
+          user = {
+            id,
+            ...user,
+          };
+          database.push(user);
+          res.status(201).json({
+            status: 201,
+            result: database,
+          });
+        } else {
+            res.status(400).json({
+                status: 400,
+                result: "User already exists",
+            });
+        }
   },
 
     //getAllUsers UC-202
