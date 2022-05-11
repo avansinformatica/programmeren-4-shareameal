@@ -45,8 +45,13 @@ let controller = {
 
     userExists: (req, res, next) => {
         dbconnection.getConnection(function (err, connection) {
+            const id = req.params.userId;
+
+            if(isNaN(id)){ 
+                return next()
+            } 
             connection.query(
-                'SELECT COUNT(id) as Count FROM user WHERE id = ?', req.params.userId,
+                'SELECT COUNT(id) as count FROM user WHERE id = ?', `${id}`,
                 function (err, results, fields) {
 
                     if (err) throw err;
@@ -71,7 +76,7 @@ let controller = {
             let user = req.body;
 
             connection.query(
-                'SELECT COUNT(emailAdress) as Count FROM user WHERE emailAdress = ?', user.emailAdress,
+                'SELECT COUNT(emailAdress) as count FROM user WHERE emailAdress = ?', user.emailAdress,
                 function (error, results, fields) {
                     connection.release();
 
