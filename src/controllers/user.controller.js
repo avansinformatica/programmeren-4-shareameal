@@ -336,7 +336,7 @@ let controller = {
                     console.log('#results = ', results.length);
                     res.status(200).json({
                         status: 200,
-                        result: results,
+                        message: "User has been deleted",
                     });
                 });
 
