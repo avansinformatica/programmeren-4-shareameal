@@ -101,7 +101,7 @@ describe("Manage users", () => {
           });
 
     // DONE
-    it.only("UC-201-4 When user already exists, a valid error should be returned", (done) => {
+    it("UC-201-4 When user already exists, a valid error should be returned", (done) => {
           chai
             .request(server)
             .post("/api/user")
@@ -178,134 +178,134 @@ describe("UC-202 Overview users /api/user", () => {
         });
     });
 
-//TODO ?? only one user?
-    it("UC-202-2 Give 2 users, return 200 response", (done) => {
-      let user = new User({firstName: "Pietje", lastName: "Precies", street: "Straatnaam 3", city: "Breda", isActive: true, emailAdress: "pietje@precies.nl", password: "PietjesPassword123", phoneNumber: "0612233445"})
-      user.save((err, user) => {
-        chai
-          .request(server)
-          .get("/api/user")
-          .end((err, res) => {
-            res.should.be.an("object");
-            let { status, result } = res.body;
-            status.should.equals(200);
-            result.should.be
-              .a("array");
-            result.length.should.be.eql(2);
-            done();
-          });
-      })
-    });
-
-//TODO
-    it("UC-202-3 Give users with non existing name, return 200 response", (done) => {
-          chai
-            .request(server)
-            .get("/api/user")
-            .send({
-              //
-              firstName: "Anika",
-              lastName: "Wante",
-              street: "Academiesingel 17",
-              city: "Breda",
-              isActive: true,
-              emailAdress: "test@student.avans.nl",
-              password: "password",
-              phoneNumber: "0612345678"
-            })
-            .end((err, res) => {
-              res.should.be.an("object");
-              let { status, result } = res.body;
-              status.should.equals(400);
-              result.should.be
-                .a("string")
-                .that.equals("Password is invalid");
-              done();
-            });
-          });
-
-//TODO
-    it("UC-202-4 Give users for 'isActive' = false, return 200 response", (done) => {
-          chai
-            .request(server)
-            .post("/api/user")
-            .send({
-              //
-              firstName: "Anika",
-              lastName: "Wante",
-              street: "Academiesingel 17",
-              city: "Breda",
-              isActive: true,
-              emailAdress: "test@student.avans.nl",
-              password: "P@ssw0rd123",
-              phoneNumber: "0612345678"
-            })
-            .end((err, res) => {
-              res.should.be.an("object");
-              let { status, result } = res.body;
-              status.should.equals(400);
-              result.should.be
-                .a("string")
-                .that.equals("User already exists");
-              done();
-            });
-          });
-
-
-//TODO
-    it("UC-202-5 Give users for 'isActive' = true, return 200 response", (done) => {
-          chai
-            .request(server)
-            .post("/api/user")
-            .send({
-              //
-              firstName: "Anika",
-              lastName: "Wante",
-              street: "Academiesingel 17",
-              city: "Breda",
-              isActive: true,
-              emailAdress: "test@student.avans.nl",
-              password: "P@ssw0rd123",
-              phoneNumber: "0612345678"
-            })
-            .end((err, res) => {
-              res.should.be.an("object");
-              let { status, result } = res.body;
-              status.should.equals(400);
-              result.should.be
-                .a("string")
-                .that.equals("User already exists");
-              done();
-            });
-          });
-
-//TODO
-    it("UC-202-6 Give users with existing name, return 200 response", (done) => {
-          chai
-            .request(server)
-            .post("/api/user")
-            .send({
-              //
-              firstName: "Anika",
-              lastName: "Wante",
-              street: "Academiesingel 17",
-              city: "Breda",
-              isActive: true,
-              emailAdress: "test@student.avans.nl",
-              password: "P@ssw0rd123",
-              phoneNumber: "0612345678"
-            })
-            .end((err, res) => {
-              res.should.be.an("object");
-              let { status, result } = res.body;
-              status.should.equals(200);
+////TODO ?? only one user?
+//    it("UC-202-2 Give 2 users, return 200 response", (done) => {
+//      let user = new User({firstName: "Pietje", lastName: "Precies", street: "Straatnaam 3", city: "Breda", isActive: true, emailAdress: "pietje@precies.nl", password: "PietjesPassword123", phoneNumber: "0612233445"})
+//      user.save((err, user) => {
+//        chai
+//          .request(server)
+//          .get("/api/user")
+//          .end((err, res) => {
+//            res.should.be.an("object");
+//            let { status, result } = res.body;
+//            status.should.equals(200);
+//            result.should.be
+//              .a("array");
+//            result.length.should.be.eql(2);
+//            done();
+//          });
+//      })
+//    });
+//
+////TODO
+//    it("UC-202-3 Give users with non existing name, return 200 response", (done) => {
+//          chai
+//            .request(server)
+//            .get("/api/user")
+//            .send({
+//              //
+//              firstName: "Anika",
+//              lastName: "Wante",
+//              street: "Academiesingel 17",
+//              city: "Breda",
+//              isActive: true,
+//              emailAdress: "test@student.avans.nl",
+//              password: "password",
+//              phoneNumber: "0612345678"
+//            })
+//            .end((err, res) => {
+//              res.should.be.an("object");
+//              let { status, result } = res.body;
+//              status.should.equals(400);
 //              result.should.be
 //                .a("string")
-//                .that.equals("User is successfully registered");
-              done();
-            });
-    });
-  });
+//                .that.equals("Password is invalid");
+//              done();
+//            });
+//          });
+//
+////TODO
+//    it("UC-202-4 Give users for 'isActive' = false, return 200 response", (done) => {
+//          chai
+//            .request(server)
+//            .post("/api/user")
+//            .send({
+//              //
+//              firstName: "Anika",
+//              lastName: "Wante",
+//              street: "Academiesingel 17",
+//              city: "Breda",
+//              isActive: true,
+//              emailAdress: "test@student.avans.nl",
+//              password: "P@ssw0rd123",
+//              phoneNumber: "0612345678"
+//            })
+//            .end((err, res) => {
+//              res.should.be.an("object");
+//              let { status, result } = res.body;
+//              status.should.equals(400);
+//              result.should.be
+//                .a("string")
+//                .that.equals("User already exists");
+//              done();
+//            });
+//          });
+//
+//
+////TODO
+//    it("UC-202-5 Give users for 'isActive' = true, return 200 response", (done) => {
+//          chai
+//            .request(server)
+//            .post("/api/user")
+//            .send({
+//              //
+//              firstName: "Anika",
+//              lastName: "Wante",
+//              street: "Academiesingel 17",
+//              city: "Breda",
+//              isActive: true,
+//              emailAdress: "test@student.avans.nl",
+//              password: "P@ssw0rd123",
+//              phoneNumber: "0612345678"
+//            })
+//            .end((err, res) => {
+//              res.should.be.an("object");
+//              let { status, result } = res.body;
+//              status.should.equals(400);
+//              result.should.be
+//                .a("string")
+//                .that.equals("User already exists");
+//              done();
+//            });
+//          });
+//
+////TODO
+//    it("UC-202-6 Give users with existing name, return 200 response", (done) => {
+//          chai
+//            .request(server)
+//            .post("/api/user")
+//            .send({
+//              //
+//              firstName: "Anika",
+//              lastName: "Wante",
+//              street: "Academiesingel 17",
+//              city: "Breda",
+//              isActive: true,
+//              emailAdress: "test@student.avans.nl",
+//              password: "P@ssw0rd123",
+//              phoneNumber: "0612345678"
+//            })
+//            .end((err, res) => {
+//              res.should.be.an("object");
+//              let { status, result } = res.body;
+//              status.should.equals(200);
+////              result.should.be
+////                .a("string")
+////                .that.equals("User is successfully registered");
+//              done();
+//            });
+//    });
+//  });
 //**************
 /*
 //**************
@@ -449,58 +449,58 @@ describe("UC-205 Change user /api/user/:userId", () => {
     });
 
 //TODO
-    it("UC-205-2 invalid postal code, return 400 response", (done) => {
-      chai
-        .request(server)
-        .post("/api/user")
-        .send({
-          //fout email address
-          firstName: "Anika",
-          lastName: "Wante",
-          street: "Academiesingel 17",
-          city: "Breda",
-          isActive: true,
-          emailAdress: "wantestudent.avans.nl",
-          password: "P@ssw0rd123",
-          phoneNumber: "0612345678"
-        })
-        .end((err, res) => {
-          res.should.be.an("object");
-          let { status, result } = res.body;
-          status.should.equals(400);
-          result.should.be
-            .a("string")
-            .that.equals("Email Address must contain an @ symbol and a dot");
-          done();
-        });
-    });
-
-//TODO
-    it("UC-205-3 Invalid phone number, return 400 response", (done) => {
-          chai
-            .request(server)
-            .post("/api/user")
-            .send({
-              //
-              firstName: "Anika",
-              lastName: "Wante",
-              street: "Academiesingel 17",
-              city: "Breda",
-              isActive: true,
-              emailAdress: "test@student.avans.nl",
-              password: "password",
-              phoneNumber: "0612345678"
-            })
-            .end((err, res) => {
-              res.should.be.an("object");
-              let { status, result } = res.body;
-              status.should.equals(400);
-              result.should.be
-                .a("string")
-                .that.equals("Password is invalid");
-              done();
-            });
-          });
+//    it("UC-205-2 invalid postal code, return 400 response", (done) => {
+//      chai
+//        .request(server)
+//        .post("/api/user")
+//        .send({
+//          //fout email address
+//          firstName: "Anika",
+//          lastName: "Wante",
+//          street: "Academiesingel 17",
+//          city: "Breda",
+//          isActive: true,
+//          emailAdress: "wantestudent.avans.nl",
+//          password: "P@ssw0rd123",
+//          phoneNumber: "0612345678"
+//        })
+//        .end((err, res) => {
+//          res.should.be.an("object");
+//          let { status, result } = res.body;
+//          status.should.equals(400);
+//          result.should.be
+//            .a("string")
+//            .that.equals("Email Address must contain an @ symbol and a dot");
+//          done();
+//        });
+//    });
+//
+////TODO
+//    it("UC-205-3 Invalid phone number, return 400 response", (done) => {
+//          chai
+//            .request(server)
+//            .post("/api/user")
+//            .send({
+//              //
+//              firstName: "Anika",
+//              lastName: "Wante",
+//              street: "Academiesingel 17",
+//              city: "Breda",
+//              isActive: true,
+//              emailAdress: "test@student.avans.nl",
+//              password: "password",
+//              phoneNumber: "0612345678"
+//            })
+//            .end((err, res) => {
+//              res.should.be.an("object");
+//              let { status, result } = res.body;
+//              status.should.equals(400);
+//              result.should.be
+//                .a("string")
+//                .that.equals("Password is invalid");
+//              done();
+//            });
+//          });
 
     // DONE
     it("UC-205-4 User doesn't exist, return 400 response", (done) => {
@@ -510,12 +510,13 @@ describe("UC-205 Change user /api/user/:userId", () => {
             .end((err, res) => {
                 res.should.be.an("object");
                 let { status, result } = res.body;
-                status.should.equals(401);
+                status.should.equals(400);
                 result.should.be
                     .a("string")
                     .that.equals("User with ID 3 not found");
                 done();
             });
+
     });
 
 
@@ -657,7 +658,7 @@ describe("UC-206 Delete user /api/user/:userId", () => {
 //**************
     });
 });
-
+})
 
 
 

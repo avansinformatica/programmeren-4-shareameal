@@ -12,7 +12,7 @@ let controller = {
   addUser: (req, res) => {
   //TODO check if user exists
     const userId = req.params.userId;
-    console.log(`User met ID ${userId} gezocht`);
+//    console.log(`User met ID ${userId} gezocht`);
     let user = database.findIndex((item) => item.id == userId);
         if (user >= 0) {
           id++;
@@ -40,7 +40,7 @@ let controller = {
       //   result: database,
       // });
       //valideer als goede data is bij post
-      console.log("getAllUsers aangeroepen");
+//      console.log("getAllUsers aangeroepen");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
 
@@ -59,7 +59,7 @@ let controller = {
               statusCode: 200,
               results: results,
             });
-            console.log("result = ", results);
+//            console.log("result = ", results);
           }
         );
       });
@@ -107,17 +107,17 @@ let controller = {
     //getUserById UC-204
   getUserById: (req, res, next) => {
     const userId = req.params.userId;
-    console.log(`User met ID ${userId} gezocht`);
+//    console.log(`User met ID ${userId} gezocht`);
     let user = database.findIndex((item) => item.id == userId);
     if (user >= 0) {
-        console.log("IN IF STATEMENT");
-      console.log(user);
+//        console.log("IN IF STATEMENT");
+//      console.log(user);
       res.status(200).json({
         status: 200,
         result: user,
       });
     } else {
-    console.log("IN ELSE STATEMENT");
+//    console.log("IN ELSE STATEMENT");
         res.status(404).json({
             status: 404,
             result: `User with ID ${userId} not found`,
@@ -128,9 +128,9 @@ let controller = {
     //updateSingleUser UC-205
   updateSingleUser: (req, res, next) => {
     const userId = req.params.userId;
-    console.log(`User met ID ${userId} wordt gezocht`);
+//    console.log(`User met ID ${userId} wordt gezocht`);
     let user = database.findIndex((item) => item.id == userId);
-    console.log(req.body)
+//    console.log(req.body)
     if (user >= 0) {
             database[user].firstName = req.body.firstName;
             database[user].lastName = req.body.lastName;
@@ -157,10 +157,10 @@ let controller = {
     //deleteSingleUser UC-206
   deleteSingleUser: (req, res, next) => {
     const userId = req.params.userId;
-    console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
+//    console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
     let user = database.filter((item) => item.id == userId);
     if (user.length > 0) {
-        console.log(database.findIndex(x => x.id == userId))
+//        console.log(database.findIndex(x => x.id == userId))
         let databaseT = database.splice((database.findIndex(x => x.id == userId)) , 1);
 
         res.status(200).json({
