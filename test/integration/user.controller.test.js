@@ -320,7 +320,7 @@ describe("Manage users /api/user", () => {
                 let { status } = res.body;
 
                 status.should.equals(200);
-                res.body.should.have.property("result");
+                res.body.should.have.property("message");
 
                 done();
             });
