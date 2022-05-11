@@ -37,7 +37,7 @@ router.get("/api/user/profile", (req, res, next) => {
 
 // IN CONTROLLER
 // UC-205 Update a single user
-router.put("/api/user/:userId", userController.updateSingleUser);
+router.put("/api/user/:userId", userController.validateUser, userController.updateSingleUser);
 
 // IN CONTROLLER
 // UC-206 Delete a user

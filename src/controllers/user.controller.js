@@ -3,20 +3,20 @@ const assert = require("assert");
 
 const dbconnection = require("../../database/dbconnection");
 
-let database = [];
+let database = [{id: 1, firstName: "Red", lastName: "Bull", street: "Straatje", city: "Zandvoort", isActive: true, emailAdress: "red@bull.nl", password: "RedBull=123", phoneNumber: "0698876554"}, {id: 2, firstName: "Pietje", lastName: "Precies", street: "Laan", city: "Amsterdam", isActive: true, emailAdress: "pietje@precies.nl", password: "PietjePrecies=123", phoneNumber: "0612345678"}];
 let id = 0;
 
 let controller = {
 
     //addUser UC-201
   addUser: (req, res) => {
+  //TODO check if user exists
     let user = req.body;
     id++;
     user = {
       id,
       ...user,
     };
-    console.log(user);
     database.push(user);
     res.status(201).json({
       status: 201,
@@ -99,19 +99,20 @@ let controller = {
   getUserById: (req, res, next) => {
     const userId = req.params.userId;
     console.log(`User met ID ${userId} gezocht`);
-    let user = database.filter((item) => item.id == userId);
-    if (user.length > 0) {
+    let user = database.findIndex((item) => item.id == userId);
+    if (user >= 0) {
+        console.log("IN IF STATEMENT");
       console.log(user);
       res.status(200).json({
         status: 200,
         result: user,
       });
     } else {
-      const error = {
-        status: 404,
-        result: `User with ID ${userId} not found`,
-      };
-      next(error);
+    console.log("IN ELSE STATEMENT");
+        res.status(404).json({
+            status: 404,
+            result: `User with ID ${userId} not found`,
+        });
     }
   },
 
@@ -119,24 +120,23 @@ let controller = {
   updateSingleUser: (req, res, next) => {
     const userId = req.params.userId;
     console.log(`User met ID ${userId} wordt gezocht`);
-    let user = database.filter((item) => item.id == userId);
-    if (user.length > 0) {
-      let databaseT = database.splice(userId);
-      database = databaseT;
+    let user = database.findIndex((item) => item.id == userId);
+    console.log(req.body)
+    if (user >= 0) {
+            database[user].firstName = req.body.firstName;
+            database[user].lastName = req.body.lastName;
+            database[user].street = req.body.street;
+            database[user].city = req.body.city;
+            database[user].isActive = req.body.isActive;
+            database[user].emailAdress = req.body.emailAdress;
+            database[user].password = req.body.password;
+            database[user].phoneNumber = req.body.phoneNumber;
 
-      let user = req.body;
-      id++;
-      user = {
-        id,
-        ...user,
-      };
-      console.log(user);
-      database.push(user);
+            res.status(200).json({
+                status: 200,
+                result: database
+            })
 
-      res.status(200).json({
-        status: 200,
-        result: database,
-      });
     } else {
       res.status(401).json({
         status: 401,
@@ -151,15 +151,16 @@ let controller = {
     console.log(`User met ID ${userId} wordt gezocht om te verwijderen`);
     let user = database.filter((item) => item.id == userId);
     if (user.length > 0) {
-      let databaseT = database.splice(userId);
-      database = databaseT;
-      res.status(200).json({
-        status: 200,
-        result: database,
-      });
+        console.log(database.findIndex(x => x.id == userId))
+        let databaseT = database.splice((database.findIndex(x => x.id == userId)) , 1);
+
+        res.status(200).json({
+            status: 200,
+            result: database,
+        });
     } else {
-      res.status(401).json({
-        status: 401,
+      res.status(404).json({
+        status: 404,
         result: `User with ID ${userId} not found`,
       });
     }
