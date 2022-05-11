@@ -1,5 +1,6 @@
 const express = require('express')
 const movieRoutes = require('./src/routes/movie.routes')
+const dbconnection = require('./database/dbconnection')
 require('dotenv').config()
 
 const port = process.env.PORT
@@ -23,9 +24,26 @@ app.all('*', (req, res) => {
 })
 
 // Hier moet je nog je Express errorhandler toevoegen.
+app.use((err, req, res, next) => {
+    console.log('Error handler called.')
+    res.status(500).json({
+        statusCode: 500,
+        message: err.toString(),
+    })
+})
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
+})
+
+process.on('SIGINT', () => {
+    console.log('SIGINT signal received: closing HTTP server')
+    dbconnection.end((err) => {
+        console.log('Database connection closed')
+    })
+    app.close(() => {
+        console.log('HTTP server closed')
+    })
 })
 
 // we exporteren de Express app server zodat we die in

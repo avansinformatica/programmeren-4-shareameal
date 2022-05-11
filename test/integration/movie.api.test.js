@@ -20,15 +20,15 @@ const CLEAR_DB = CLEAR_MEAL_TABLE + CLEAR_PARTICIPANTS_TABLE + CLEAR_USERS_TABLE
 
 /**
  * Voeg een user toe aan de database. Deze user heeft id 1.
- * Deze id kun je als foreign key gebruiken in de andere queries, bv insert studenthomes.
+ * Deze id kun je als foreign key gebruiken in de andere queries, bv insert meal.
  */
 const INSERT_USER =
     'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
     '(1, "first", "last", "name@server.nl", "secret", "street", "city");'
 
 /**
- * Query om twee meals toe te voegen. Let op de UserId, die moet matchen
- * met de user die je ook toevoegt.
+ * Query om twee meals toe te voegen. Let op de cookId, die moet matchen
+ * met een bestaande user in de database.
  */
 const INSERT_MEALS =
     'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
@@ -143,7 +143,7 @@ describe('Movies API', () => {
                         .an('object')
                         .that.has.all.keys('results', 'statusCode')
 
-                    let { statusCode, results } = res.body
+                    const { statusCode, results } = res.body
                     statusCode.should.be.an('number')
                     results.should.be.an('array').that.has.length(2)
                     results[0].name.should.equal('Meal A')
