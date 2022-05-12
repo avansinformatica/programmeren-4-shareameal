@@ -363,6 +363,8 @@ let controller = {
                         status: 200,
                         message: "User has been deleted",
                     });
+
+                    res.end();
                 });
 
         });
