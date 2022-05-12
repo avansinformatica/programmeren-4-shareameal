@@ -267,7 +267,7 @@ let controller = {
                                 });
     
                                 //end response process
-                                res.end();
+                                // res.end();
                             });
                         } else {
                             //return false status if email is already in use by another user
