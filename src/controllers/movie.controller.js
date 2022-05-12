@@ -1,5 +1,5 @@
-const database = require('../../database/inmemdb')
-const dbconnection = require('../../database/dbconnection')
+const dbconnection = require('../database/dbconnection')
+const logger = require('../config/config').logger
 const assert = require('assert')
 
 /**
@@ -10,34 +10,19 @@ const assert = require('assert')
 module.exports = {
     // createMovie is een attribuut dat als waarde een functie heeft.
     createMovie: (req, res, next) => {
-        // Hier gebruiken we nu de inmem database module om een movie toe te voegen.
-        // Optie: check vooraf of req.body wel de juiste properties/attribute bevat - gaan we later doen
-
-        // We geven in de createMovie functie de callbackfunctie mee. Die kan een error of een result teruggeven.
-        database.createMovie(req.body, (error, result) => {
-            if (error) {
-                console.log(`index.js : ${error}`)
-                res.status(401).json({
-                    statusCode: 401,
-                    error, // als de key en de value het zelfde kun je die zo vermelden. Hier staat eigenlijk: error: error
-                })
-            }
-            if (result) {
-                console.log(`index.js: movie successfully added!`)
-                res.status(200).json({
-                    statusCode: 200,
-                    result,
-                })
-            }
+        logger.debug(`index.js: movie successfully added!`)
+        res.status(200).json({
+            statusCode: 200,
+            result,
         })
     },
 
     getById: (req, res, next) => {
         const movieId = req.params.movieId
-        console.log(`Movie met ID ${movieId} gezocht`)
+        logger.debug(`Movie met ID ${movieId} gezocht`)
         let movie = database.filter((item) => item.id == movieId)
         if (movie.length > 0) {
-            console.log(movie)
+            logger.debug(movie)
             res.status(200).json({
                 status: 200,
                 result: movie,
@@ -51,10 +36,10 @@ module.exports = {
     },
 
     getAll: (req, res, next) => {
-        console.log('getAll aangeroepen')
+        logger.debug(`getAll aangeroepen. req.userId = ${req.userId}`)
 
         const queryParams = req.query
-        console.log(queryParams)
+        logger.debug(queryParams)
 
         let { name, isActive } = req.query
         let queryString = 'SELECT `id`, `name` FROM `meal`'
@@ -70,7 +55,7 @@ module.exports = {
             }
         }
         queryString += ';'
-        console.log(`queryString = ${queryString}`)
+        logger.debug(`queryString = ${queryString}`)
 
         dbconnection.getConnection(function (err, connection) {
             if (err) next(err) // not connected!
@@ -87,7 +72,7 @@ module.exports = {
                     if (error) next(error)
 
                     // Don't use the connection here, it has been returned to the pool.
-                    console.log('#results = ', results.length)
+                    logger.debug('#results = ', results.length)
                     res.status(200).json({
                         statusCode: 200,
                         results: results,
@@ -111,8 +96,8 @@ module.exports = {
             next()
         } catch (err) {
             // Hier kom je als een assert failt.
-            console.log(`Error message: ${err.message}`)
-            console.log(`Error code: ${err.code}`)
+            logger.debug(`Error message: ${err.message}`)
+            logger.debug(`Error code: ${err.code}`)
             // Hier geven we een generiek errorobject terug. Dat moet voor alle
             // foutsituaties dezelfde structuur hebben. Het is nog mooier om dat
             // via de Express errorhandler te doen; dan heb je één plek waar je

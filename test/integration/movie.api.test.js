@@ -41,17 +41,17 @@ describe('Movies API', () => {
     // https://mochajs.org/#hooks
     //
     before((done) => {
-        console.log(
+        logger.debug(
             'before: hier zorg je eventueel dat de precondities correct zijn'
         )
-        console.log('before done')
+        logger.debug('before done')
         done()
     })
 
     describe('UC201 Create movie', () => {
         //
         beforeEach((done) => {
-            console.log('beforeEach called')
+            logger.debug('beforeEach called')
             // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
             dbconnection.getConnection(function (err, connection) {
                 if (err) throw err // not connected!
@@ -66,7 +66,7 @@ describe('Movies API', () => {
                         // Handle error after the release.
                         if (error) throw error
                         // Let op dat je done() pas aanroept als de query callback eindigt!
-                        console.log('beforeEach done')
+                        logger.debug('beforeEach done')
                         done()
                     }
                 )
@@ -111,7 +111,7 @@ describe('Movies API', () => {
     describe('UC-303 Lijst van maaltijden opvragen /api/meal', () => {
         //
         beforeEach((done) => {
-            console.log('beforeEach called')
+            logger.debug('beforeEach called')
             // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
             dbconnection.getConnection(function (err, connection) {
                 if (err) throw err // not connected!
@@ -123,7 +123,7 @@ describe('Movies API', () => {
                         // Handle error after the release.
                         if (error) throw error
                         // Let op dat je done() pas aanroept als de query callback eindigt!
-                        console.log('beforeEach done')
+                        logger.debug('beforeEach done')
                         done()
                     }
                 )

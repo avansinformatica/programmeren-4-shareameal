@@ -1,6 +1,8 @@
 const express = require('express')
+const authRoutes = require('./src/routes/authentication.routes')
 const movieRoutes = require('./src/routes/movie.routes')
-const dbconnection = require('./database/dbconnection')
+const dbconnection = require('./src/database/dbconnection')
+const logger = require('./src/config/config').logger
 require('dotenv').config()
 
 const port = process.env.PORT
@@ -9,12 +11,13 @@ app.use(express.json())
 
 app.all('*', (req, res, next) => {
     const method = req.method
-    console.log(`Method ${method} is aangeroepen`)
+    logger.debug(`Method ${method} is aangeroepen`)
     next()
 })
 
 // Alle routes beginnen met /api
 app.use('/api', movieRoutes)
+app.use('/api', authRoutes)
 
 app.all('*', (req, res) => {
     res.status(401).json({
@@ -25,7 +28,7 @@ app.all('*', (req, res) => {
 
 // Hier moet je nog je Express errorhandler toevoegen.
 app.use((err, req, res, next) => {
-    console.log('Error handler called.')
+    logger.debug('Error handler called.')
     res.status(500).json({
         statusCode: 500,
         message: err.toString(),
@@ -33,16 +36,16 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    logger.debug(`Example app listening on port ${port}`)
 })
 
 process.on('SIGINT', () => {
-    console.log('SIGINT signal received: closing HTTP server')
+    logger.debug('SIGINT signal received: closing HTTP server')
     dbconnection.end((err) => {
-        console.log('Database connection closed')
+        logger.debug('Database connection closed')
     })
     app.close(() => {
-        console.log('HTTP server closed')
+        logger.debug('HTTP server closed')
     })
 })
 
