@@ -143,6 +143,27 @@ let controller = {
     },
 
     getAllUsers:(req, res) => {
+        let {firstName, isActive} = req.query
+        console.log(`name = ${firstName} isActive ${isActive}`)
+
+        let queryString = 'SELECT `id`, `firstName` FROM `user`'
+        if (firstName || isActive) {
+            queryString += ' WHERE '
+            if (firstName) {
+                queryString += ` firstName LIKE `
+            }
+            if (firstName && isActive) {
+                queryString += ' AND '
+            }
+            if (isActive) {
+                queryString += `isActive = '${isActive}'`
+            }
+        }
+
+        console.log(queryString);
+
+        firstName = '%' + firstName + '%'
+
         dbconnection.getConnection(function(err, connection) {
             if (err)throw err; // not connected!
            
@@ -342,6 +363,8 @@ let controller = {
                         status: 200,
                         message: "User has been deleted",
                     });
+
+                    res.end();
                 });
 
         });
