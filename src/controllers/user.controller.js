@@ -326,6 +326,10 @@ let controller = {
 
             const userId = Number(req.params.userId);
 
+            if (isNaN(userId)) {
+                next()
+            }
+
             connection.query(
                 `DELETE FROM user WHERE id = '${userId}'`,
                 function (error, results, fields) {
