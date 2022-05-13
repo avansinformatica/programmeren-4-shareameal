@@ -4,6 +4,7 @@ require("dotenv").config();
 const port = process.env.PORT;
 const bodyParser = require("body-parser");
 const userRouter = require("./src/routes/user.routes");
+const logger = require("./src/config/config").logger;
 const res = require("express/lib/response");
 
 app.use(bodyParser.json());
