@@ -150,7 +150,8 @@ let controller = {
         if (firstName || isActive) {
             queryString += ' WHERE '
             if (firstName) {
-                queryString += ` firstName LIKE `
+                queryString += '`firstName` LIKE ?'
+                firstName = '%' + firstName + '%'
             }
             if (firstName && isActive) {
                 queryString += ' AND '
@@ -162,13 +163,13 @@ let controller = {
 
         console.log(queryString);
 
-        firstName = '%' + firstName + '%'
-
         dbconnection.getConnection(function(err, connection) {
-            if (err)throw err; // not connected!
+            if (err){
+                next(err)
+            }; // not connected!
            
             // Use the connection
-            connection.query('SELECT * FROM user', function (error, results, fields) {
+            connection.query(queryString, [firstName, isActive], function (error, results, fields) {
               // When done with the connection, release it.
               connection.release();
            
