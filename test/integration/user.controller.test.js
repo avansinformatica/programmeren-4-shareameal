@@ -1,3 +1,5 @@
+process.env.DATABASE = process.env.DATABASE || 'share-a-meal-testdb'
+
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../../index");
