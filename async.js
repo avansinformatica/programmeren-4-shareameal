@@ -6,7 +6,7 @@ function doSomething(callback) {
 }
 
 doSomething((myvalue) => {
-  console.log("myvalue = " + myvalue);
+  logger.debug("myvalue = " + myvalue);
 });
 
-console.log("Nu zijn we hier");
+logger.debug("Nu zijn we hier");

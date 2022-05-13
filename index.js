@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 app.all("*", (req, res, next) => {
   const method = req.method;
-  console.log(`Method ${method} is aangeroepen`);
+  logger.debug(`Method ${method} is aangeroepen`);
   next();
 });
 
@@ -30,7 +30,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  logger.debug(`Example app listening on port ${port}`);
 });
 
 module.exports = app;

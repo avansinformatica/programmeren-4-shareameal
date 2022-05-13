@@ -24,21 +24,21 @@ const pool = mysql.createPool({
 //       if (error) throw error;
 
 //       // Don't use the connection here, it has been returned to the pool.
-//       console.log("result = ", results);
+//       logger.debug("result = ", results);
 
 //       pool.end((err) => {
-//         console.log("pool was closed.");
+//         logger.debug("pool was closed.");
 //       });
 //     }
 //   );
 // });
 
 pool.on("acquire", function (connection) {
-  console.log("Connection %d acquired", connection.threadId);
+  logger.debug("Connection %d acquired", connection.threadId);
 });
 
 pool.on("release", function (connection) {
-  console.log("Connection %d released", connection.threadId);
+  logger.debug("Connection %d released", connection.threadId);
 });
 
 module.exports = pool;
