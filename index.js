@@ -27,7 +27,11 @@ app.all("*", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  res.status(500).json(err);
+  logger.debug("Error handler called.");
+  res.status(err.status).json({
+    statusCode: err.status,
+    message: err.toString(),
+  });
 });
 
 app.listen(port, () => {
