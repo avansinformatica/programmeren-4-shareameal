@@ -500,8 +500,23 @@ describe("UC-203 Request userprofile /api/user/??profile or :userId", () => {
   //**************
   describe("UC-205 Change user /api/user/:userId", () => {
     beforeEach((done) => {
-      database = [];
-      done();
+      logger.debug("beforeEach called");
+      // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+      dbconnection.getConnection(function (err, connection) {
+        if (err) next(err); // not connected!
+
+        // Use the connection
+        connection.query(CLEAR_DB, function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) next(err);
+          // done() aanroepen nu je de query callback eindigt.
+          logger.debug("beforeEach done");
+          done();
+        });
+      });
     });
 
     //DONE
@@ -527,7 +542,7 @@ describe("UC-203 Request userprofile /api/user/??profile or :userId", () => {
           logger.debug("res.statusCode: ");
           logger.debug(res.statusCode);
           logger.debug("res.result: ");
-          logger.debug(res.body.err.result); //?????????????????????????????????????????????????????????????????????????????????
+          logger.debug(res.body.err.result);
           res.statusCode.should.eql(400);
           res.body.err.result.should.be
             .a("string")
