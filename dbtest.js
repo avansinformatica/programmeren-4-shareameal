@@ -11,7 +11,7 @@ const pool = mysql.createPool({
 });
 
 // pool.getConnection(function (err, connection) {
-//   if (err) throw err; // not connected!
+//   if (err) next (err); // not connected!
 
 //   // Use the connection
 //   connection.query(
@@ -21,7 +21,7 @@ const pool = mysql.createPool({
 //       connection.release();
 
 //       // Handle error after the release.
-//       if (error) throw error;
+//       if (error) next (err);
 
 //       // Don't use the connection here, it has been returned to the pool.
 //       logger.debug("result = ", results);

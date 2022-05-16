@@ -12,7 +12,7 @@ module.exports = {
     logger.debug("addUser aangeroepen");
 
     dbconnection.getConnection(function (err, connection) {
-      if (err) throw err; // not connected!
+      if (err) next(err); // not connected!
 
       id++;
 
@@ -45,7 +45,7 @@ module.exports = {
             function (error, results, fields) {
               connection.release();
 
-              if (error) throw error;
+              if (error) next(err);
 
               let resultUser = results[0];
 
@@ -87,7 +87,7 @@ module.exports = {
     logger.debug(`queryString = ${queryString}`);
 
     dbconnection.getConnection(function (err, connection) {
-      if (err) throw err; // not connected!
+      if (err) next(err); // not connected!
 
       // Use the connection
       connection.query(
@@ -174,7 +174,7 @@ module.exports = {
     logger.debug(`User met ID ${userId} gezocht`);
 
     dbconnection.getConnection(function (err, connection) {
-      if (err) throw err; // not connected!
+      if (err) next(err); // not connected!
 
       // Use the connection
       connection.query(
@@ -210,7 +210,7 @@ module.exports = {
     logger.debug(`User met ID ${userId} gezocht`);
 
     dbconnection.getConnection(function (err, connection) {
-      if (err) throw err;
+      if (err) next(err);
 
       // Use the connection
       connection.query(
@@ -249,7 +249,7 @@ module.exports = {
     logger.debug(`User met ID ${userId} wordt gezocht`);
 
     dbconnection.getConnection(function (err, connection) {
-      if (err) throw err; // not connected!
+      if (err) next(err); // not connected!
 
       // Use the connection
       connection.query(

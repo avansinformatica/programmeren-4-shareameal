@@ -1,13 +1,16 @@
 const express = require("express");
-const app = express();
-require("dotenv").config();
-const port = process.env.PORT;
+const authRoutes = require("./src/routes/authentication.routes");
 const bodyParser = require("body-parser");
 const userRouter = require("./src/routes/user.routes");
 const logger = require("./src/config/config").logger;
+const dbconnection = require("./src/database/dbconnection");
 const res = require("express/lib/response");
+require("dotenv").config();
 
-app.use(bodyParser.json());
+const app = express();
+const port = process.env.PORT;
+// app.use(bodyParser.json());
+app.use(express.json());
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -29,8 +32,7 @@ app.all("*", (req, res) => {
 app.use((err, req, res, next) => {
   logger.debug("Error handler called.");
   res.status(err.status).json({
-    statusCode: err.status,
-    message: err.toString(),
+    err,
   });
 });
 
