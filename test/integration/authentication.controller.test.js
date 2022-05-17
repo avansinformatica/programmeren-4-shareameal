@@ -39,7 +39,7 @@ const INSERT_MEALS =
   "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
   "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);";
 
-//Login authentication
+//UC-101 = Login authentication
 describe("Manage login", () => {
   describe("UC-101 login", () => {
     beforeEach((done) => {
@@ -73,10 +73,9 @@ describe("Manage login", () => {
     //it.only when you only want to run this test
     //it.skip if you only want to skip this test
 
-    // DONE
+    // UC 101-1 t/m 101-4
+
     it.only("UC-101-5 User succesfully logged in, return 200 status", (done) => {
-      logger.debug("beforeEach called");
-      // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
       chai
         .request(server)
         .get("/api/movie")
