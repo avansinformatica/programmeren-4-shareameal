@@ -89,23 +89,12 @@ describe("Manage login", () => {
     it.only("UC-101-5 User succesfully logged in, return 200 status", (done) => {
       chai
         .request(server)
-        .get("/api/user")
-        .set("authorization", "Bearer " + token)
+        .post("/api/auth/login")
+        .send({ emailAdress: "name@server.nl", password: "secret" })
         .end((err, res) => {
-          assert.ifError(err);
-
+          logger.info(res.body);
           res.should.have.status(200);
-          res.should.be.an("object");
-
-          res.body.should.be
-            .an("object")
-            .that.has.all.keys("results", "statusCode");
-
-          const { statusCode, results } = res.body;
-          statusCode.should.be.an("number");
-          results.should.be.an("array").that.has.length(2);
-          results[0].name.should.equal("Meal A");
-          results[0].id.should.equal(1);
+          res.body.results.emailAdress.should.be.equal("name@server.nl");
           done();
         });
     });

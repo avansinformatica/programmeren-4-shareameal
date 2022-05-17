@@ -18,6 +18,7 @@ module.exports = {
         });
       }
       if (connection) {
+        logger.info(req.body);
         // 1. Kijk of deze useraccount bestaat.
         connection.query(
           "SELECT `id`, `emailAdress`, `password`, `firstName`, `lastName` FROM `user` WHERE `emailAdress` = ?",
@@ -33,6 +34,7 @@ module.exports = {
             }
             if (rows) {
               // 2. Er was een resultaat, check het password.
+              logger.info(rows);
               if (
                 rows &&
                 rows.length === 1 &&
