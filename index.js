@@ -9,7 +9,6 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT;
-// app.use(bodyParser.json());
 app.use(express.json());
 
 app.all("*", (req, res, next) => {
@@ -18,8 +17,8 @@ app.all("*", (req, res, next) => {
   next();
 });
 
-app.use(userRouter); //app.use("/api", userRoutes);
-//app.use(mealRouter); //app.use("/api", mealRoutes);
+app.use("/api", userRouter);
+app.use("/api", authRoutes);
 
 app.all("*", (req, res) => {
   res.status(401).json({
@@ -38,6 +37,16 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
   logger.debug(`Example app listening on port ${port}`);
+});
+
+process.on("SIGINT", () => {
+  logger.debug("SIGINT signal received: closing HTTP server");
+  dbconnection.end((err) => {
+    logger.debug("Database connection closed");
+  });
+  app.close(() => {
+    logger.debug("HTTP server closed");
+  });
 });
 
 module.exports = app;
