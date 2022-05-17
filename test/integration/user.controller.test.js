@@ -1,4 +1,4 @@
-process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal-testdb";
+process.env.DB_DATABASE = process.env.DB_DATABASE || "prog4";
 process.env.LOGLEVEL = "debug"; //warn
 
 const chai = require("chai");
@@ -494,7 +494,7 @@ describe("Manage users", () => {
       logger.debug("beforeEach called");
       // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
       dbconnection.getConnection(function (err, connection) {
-        if (err) next(err); // not connected!
+        if (err) throw err; // not connected!
 
         // Use the connection
         connection.query(CLEAR_DB, function (error, results, fields) {
@@ -511,7 +511,7 @@ describe("Manage users", () => {
     });
 
     //DONE FINAL
-    it("UC-205-1 A required field is missing, return 400 response", (done) => {
+    it.only("UC-205-1 A required field is missing, return 400 response", (done) => {
       chai
         .request(server)
         .put("/api/user/1")

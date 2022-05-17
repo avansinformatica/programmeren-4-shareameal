@@ -17,8 +17,8 @@ app.all("*", (req, res, next) => {
   next();
 });
 
-app.use("/api", userRouter);
-app.use("/api", authRoutes);
+app.use(userRouter);
+app.use(authRoutes);
 
 app.all("*", (req, res) => {
   res.status(401).json({
