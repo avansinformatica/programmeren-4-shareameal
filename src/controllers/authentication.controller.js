@@ -36,7 +36,7 @@ module.exports = {
               if (
                 rows &&
                 rows.length === 1 &&
-                rows[0].password == req.body.password
+                rows[0].password === req.body.password
               ) {
                 logger.info(
                   "passwords DID match, sending userinfo and valid token"

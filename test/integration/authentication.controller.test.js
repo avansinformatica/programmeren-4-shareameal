@@ -1,4 +1,4 @@
-process.env.DB_DATABASE = process.env.DB_DATABASE || "prog4";
+process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
 process.env.LOGLEVEL = "debug"; //warn
 
 const chai = require("chai");
@@ -42,6 +42,8 @@ const INSERT_MEALS =
 //UC-101 = Login authentication
 describe("Manage login", () => {
   describe("UC-101 login", () => {
+    var token;
+
     beforeEach((done) => {
       logger.debug("beforeEach called");
       // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
@@ -54,8 +56,7 @@ describe("Manage login", () => {
 
         // Use the connection
         connection.query(
-          CLEAR_DB,
-          INSERT_USER,
+          CLEAR_DB + INSERT_USER,
           function (error, results, fields) {
             // When done with the connection, release it.
             connection.release();
@@ -68,6 +69,16 @@ describe("Manage login", () => {
           }
         );
       });
+
+      chai
+        .request(server)
+        .post("/api/auth/login")
+        .send({ emailAdress: "name@server.nl", password: "secret" })
+        .end((err, res) => {
+          logger.info(res.body);
+          token = res.body.results.token;
+          logger.info(token);
+        });
     });
 
     //it.only when you only want to run this test
@@ -78,8 +89,8 @@ describe("Manage login", () => {
     it.only("UC-101-5 User succesfully logged in, return 200 status", (done) => {
       chai
         .request(server)
-        .get("/api/movie")
-        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+        .get("/api/user")
+        .set("authorization", "Bearer " + token)
         .end((err, res) => {
           assert.ifError(err);
 
