@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
 const authController = require("../controllers/authentication.controller");
+const authenticationController = require("../controllers/authentication.controller");
 
 router.get("/", (req, res) => {
   res.status(200).json({
@@ -14,7 +15,11 @@ router.get("/", (req, res) => {
 router.post("/api/user", userController.validateUser, userController.addUser);
 
 // UC-202 Get all users
-router.get("/api/user", userController.getAllUsers);
+router.get(
+  "/api/user",
+  authenticationController.validateToken,
+  userController.getAllUsers
+);
 
 // UC-204 Get singel user by ID
 router.get("/api/user/:userId", userController.getUserById);

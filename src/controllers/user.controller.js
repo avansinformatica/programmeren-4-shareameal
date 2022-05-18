@@ -66,7 +66,6 @@ module.exports = {
 
   //getAllUsers UC-202
   getAllUsers: (req, res, next) => {
-    //valideer als goede data is bij post
     logger.debug("getAllUsers aangeroepen");
 
     const queryParams = req.query;
@@ -105,6 +104,7 @@ module.exports = {
 
           // Don't use the connection here, it has been returned to the pool.
           logger.debug("#results = ", results.length);
+          logger.debug(results);
           res.status(200).json({
             statusCode: 200,
             results: results,

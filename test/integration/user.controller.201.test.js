@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "warn"; //debug
+process.env.LOGLEVEL = "debug"; //debug
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -63,9 +63,7 @@ describe("UC-201 add users /api/user", () => {
   });
 
   // DONE
-  it.only("TC-201-1 Verplicht veld ontbreekt", (done) => {
-    logger.debug("beforeEach called");
-    // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
+  it("TC-201-1 Verplicht veld ontbreekt", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -87,7 +85,7 @@ describe("UC-201 add users /api/user", () => {
       });
   });
 
-  it.only("TC-201-2 Niet-valide email adres", (done) => {
+  it("TC-201-2 Niet-valide email adres", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -113,7 +111,7 @@ describe("UC-201 add users /api/user", () => {
       });
   });
 
-  it.only("TC-201-3 Niet-valide wachtwoord", (done) => {
+  it("TC-201-3 Niet-valide wachtwoord", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -143,7 +141,7 @@ describe("UC-201 add users /api/user", () => {
       });
   });
 
-  it.only("TC-201-5 Gebruiker succesvol geregistreerd", (done) => {
+  it("TC-201-5 Gebruiker succesvol geregistreerd", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -190,7 +188,7 @@ describe("UC-201 add users /api/user", () => {
       });
     });
 
-    it.only("TC-201-4 Gebruiker bestaat al", (done) => {
+    it("TC-201-4 Gebruiker bestaat al", (done) => {
       logger.debug("in 201-4");
 
       chai

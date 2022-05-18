@@ -28,7 +28,18 @@ const CLEAR_DB =
  */
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES" +
-  '(1, "first", "last", "name@server.nl", "secret", "street", "city");';
+  '(1, "first", "last", "name@server.nl", "Password123$", "street", "city");';
+
+const INSERT_TWOUSERS =
+  "INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES" +
+  '(1, "first", "last", "name@server.nl", "Password123$", "street", "city");' +
+  '(2, "second", "last", "namesecond@server.nl", "Passwordsecond123$", "street", "city");';
+
+const INSERT_THREEUSERS =
+  "INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES" +
+  '(1, "first", "last", "name@server.nl", "Password123$", "street", "city");' +
+  '(2, "second", "last", "namesecond@server.nl", "Passwordsecond123$", "street", "city");' +
+  '(3, "third", "last", "namethirdd@server.nl", "Passwordthird123$", "street", "city");';
 
 /**
  * Query om twee meals toe te voegen. Let op de cookId, die moet matchen
@@ -40,56 +51,203 @@ const INSERT_MEALS =
   "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);";
 
 // UC-202 = Get all users
-describe("UC-202 Overview users /api/user", () => {
+describe("UC-202-1 Overzicht van gebruikers, return 0 users", () => {
+  var token;
+
   beforeEach((done) => {
-    database = [];
-    done();
+    logger.debug("beforeEach called");
+    // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err; // not connected!
+
+      // Use the connection
+      connection.query(
+        CLEAR_DB + INSERT_USER,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) next(err);
+          // done() aanroepen nu je de query callback eindigt.
+          logger.debug("beforeEach done");
+          done();
+        }
+      );
+    });
+
+    chai
+      .request(server)
+      .post("/api/auth/login")
+      .send({ emailAdress: "name@server.nl", password: "Password123$" })
+      .end((err, res) => {
+        logger.info(res.body);
+        if (token) {
+          token = res.body.results.token;
+        }
+        logger.info(token);
+      });
   });
 
+  // beforeEach((done) => {
+  //   logger.debug("beforeEach called");
+  //   // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+  //   dbconnection.getConnection(function (err, connection) {
+  //     if (err) next(err); // not connected!
+
+  //     // Use the connection
+  //     connection.query(
+  //       CLEAR_DB + INSERT_USER,
+  //       function (error, results, fields) {
+  //         // When done with the connection, release it.
+  //         connection.release();
+
+  //         // Handle error after the release.
+  //         if (error) next(err);
+  //         // done() aanroepen nu je de query callback eindigt.
+  //         logger.debug("beforeEach done");
+  //         done();
+  //       }
+  //     );
+  //   });
+  // });
+
   // DONE
-  it("UC-202-1 Give 0 users, return 200 response", (done) => {
+  it("UC-202-1 Toon nul gebruikers", (done) => {
     chai
       .request(server)
       .get("/api/user")
       .end((err, res) => {
         res.should.be.an("object");
         let { status, result } = res.body;
+        logger.debug(res.body);
         status.should.equals(200);
         result.should.be.a("array");
         result.length.should.be.eql(0);
         done();
       });
   });
+});
 
-  //TODO ?? only one user?
-  it("UC-202-2 Give 2 users, return 200 response", (done) => {
-    let user = new User({
-      firstName: "Pietje",
-      lastName: "Precies",
-      street: "Straatnaam 3",
-      city: "Breda",
-      isActive: true,
-      emailAdress: "pietje@precies.nl",
-      password: "PietjesPassword123",
-      phoneNumber: "0612233445",
-    });
-    user.save((err, user) => {
-      chai
-        .request(server)
-        .get("/api/user")
-        .end((err, res) => {
-          res.should.be.an("object");
-          let { status, result } = res.body;
-          status.should.equals(200);
-          result.should.be.a("array");
-          result.length.should.be.eql(2);
+describe("UC-202-2 Overzicht van gebruikers, return 2 users", () => {
+  var token;
+
+  beforeEach((done) => {
+    logger.debug("beforeEach called");
+    // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err; // not connected!
+
+      // Use the connection
+      connection.query(
+        CLEAR_DB + INSERT_THREEUSERS,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) throw err;
+          // done() aanroepen nu je de query callback eindigt.
+          logger.debug("beforeEach done");
           done();
-        });
+        }
+      );
     });
+
+    chai
+      .request(server)
+      .post("/api/auth/login")
+      .send({ emailAdress: "name@server.nl", password: "Password123$" })
+      .end((err, res) => {
+        logger.info(res.body);
+        if (res.body.results.token) {
+          token = res.body.results.token;
+        }
+        logger.info(token);
+        done();
+      });
   });
 
+  it.only("UC-202-2 Toon twee gebruikers", (done) => {
+    logger.debug("In 202-2");
+    chai
+      .request(server)
+      .get("/api/user")
+      .set("authorization", "Bearer " + token)
+      .end((err, res) => {
+        res.should.be.an("object");
+        let { status, result } = res.body;
+        status.should.equals(200);
+        result.should.be.a("array");
+        result.length.should.be.eql(2);
+        done();
+      });
+  });
+});
+
+describe("UC-202-3/6 Overzicht van gebruikers, return 1 user", () => {
+  var token;
+
+  beforeEach((done) => {
+    logger.debug("beforeEach called");
+    // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err; // not connected!
+
+      // Use the connection
+      connection.query(
+        CLEAR_DB + INSERT_TWOUSERS,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) next(err);
+          // done() aanroepen nu je de query callback eindigt.
+          logger.debug("beforeEach done");
+          done();
+        }
+      );
+    });
+
+    chai
+      .request(server)
+      .post("/api/auth/login")
+      .send({ emailAdress: "name@server.nl", password: "Password123$" })
+      .end((err, res) => {
+        logger.info(res.body);
+        if (token) {
+          token = res.body.results.token;
+        }
+        logger.info(token);
+      });
+  });
+
+  // beforeEach((done) => {
+  //   logger.debug("beforeEach called");
+  //   // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+  //   dbconnection.getConnection(function (err, connection) {
+  //     if (err) next(err); // not connected!
+
+  //     // Use the connection
+  //     connection.query(
+  //       CLEAR_DB + INSERT_USER,
+  //       function (error, results, fields) {
+  //         // When done with the connection, release it.
+  //         connection.release();
+
+  //         // Handle error after the release.
+  //         if (error) next(err);
+  //         // done() aanroepen nu je de query callback eindigt.
+  //         logger.debug("beforeEach done");
+  //         done();
+  //       }
+  //     );
+  //   });
+  // });
+
   //TODO
-  it("UC-202-3 Give users with non existing name, return 200 response", (done) => {
+  it("UC-202-3 Toon gebruikers met zoekterm op niet-bestaande naam", (done) => {
     chai
       .request(server)
       .get("/api/user")
@@ -114,7 +272,7 @@ describe("UC-202 Overview users /api/user", () => {
   });
 
   //TODO
-  it("UC-202-4 Give users for 'isActive' = false, return 200 response", (done) => {
+  it("UC-202-4 Toon gebruikers met gebruik van de zoekterm op het veld 'isActive'=false", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -139,7 +297,7 @@ describe("UC-202 Overview users /api/user", () => {
   });
 
   //TODO
-  it("UC-202-5 Give users for 'isActive' = true, return 200 response", (done) => {
+  it("UC-202-5 Toon gebruikers met gebruike van de zoekterm op het veld 'isActive'=true", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -164,10 +322,11 @@ describe("UC-202 Overview users /api/user", () => {
   });
 
   //TODO
-  it("UC-202-6 Give users with existing name, return 200 response", (done) => {
+  it("UC-202-6 Toon gebruikers met zoekterm op bestaande naam", (done) => {
     chai
       .request(server)
-      .post("/api/user")
+      .get("/api/user")
+      .set("Authorization", "Bearer " + token)
       .send({
         //
         firstName: "Anika",
