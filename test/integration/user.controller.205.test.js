@@ -62,7 +62,7 @@ describe("UC-205 * Change user /api/user/:userId", () => {
   });
 
   //DONE FINAL
-  it.only("UC-205-1 A required field is missing, return 400 response", (done) => {
+  it("UC-205-1 A required field is missing, return 400 response", (done) => {
     chai
       .request(server)
       .put("/api/user/1")

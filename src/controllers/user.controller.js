@@ -7,9 +7,8 @@ let id = 0;
 module.exports = {
   //addUser UC-201
   addUser: (req, res) => {
-    //TODO check if user exists
-    //TODO check if user is valid
     logger.debug("addUser aangeroepen");
+    //TODO check if user exists
 
     dbconnection.getConnection(function (err, connection) {
       if (err) next(err); // not connected!
@@ -20,7 +19,7 @@ module.exports = {
 
       // Use the connection
       connection.query(
-        "INSERT INTO user(firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO user(firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [
           user.firstName,
           user.lastName,
@@ -36,26 +35,30 @@ module.exports = {
           connection.release();
 
           // Handle error after the release.
-          if (error) next(error);
+          if (error) {
+            connection.release();
+            res.status(409).json({
+              status: 409,
+              message: `User already exists`,
+            });
+          } else {
+            // Get new user and send back as result
+            connection.query(
+              `SELECT * FROM user WHERE emailAdress = ?;`,
+              [user.emailAdress],
+              function (error, results, fields) {
+                connection.release();
 
-          // Get new user and send back as result
-          connection.query(
-            `SELECT * FROM user WHERE emailAdress = ?;`,
-            [user.emailAdress],
-            function (error, results, fields) {
-              connection.release();
+                let resultUser = results[0];
 
-              if (error) next(err);
-
-              let resultUser = results[0];
-
-              logger.debug("#results = ", results.length);
-              res.status(200).json({
-                statusCode: 200,
-                results: resultUser,
-              });
-            }
-          );
+                logger.debug("#results = ", results.length);
+                res.status(201).json({
+                  statusCode: 201,
+                  results: resultUser,
+                });
+              }
+            );
+          }
         }
       );
     });
@@ -137,32 +140,41 @@ module.exports = {
 
       let isUnique;
 
-      //als in database al een zelfde emailAddress staat -> error
-      //emailadress moet '@' teken bevatten en '.' teken bevatten
       function validateEmail(email) {
-        // var re = /\S+@\S+\.\S+/;
-        // return re.test(email);
-        return true;
+        var re =
+          /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        return re.test(email);
       }
 
-      assert(
-        validateEmail(emailAdress),
-        "Email Address must contain an @ symbol and a dot"
-      );
+      if (!validateEmail(req.body.emailAdress)) {
+        return res.status(400).json({
+          status: 400,
+          message: "Email Address must contain an @ symbol and a dot",
+        });
+      }
+      function validatePassword(password) {
+        var re =
+          /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/i;
+        return re.test(password);
+      }
 
-      //password is correct
-      assert(password != "password", "Password is invalid");
+      if (!validatePassword(req.body.password)) {
+        return res.status(400).json({
+          status: 400,
+          message:
+            "Password should have at least eight characters, at least one letter, one number and one special character.",
+        });
+      }
 
       next();
     } catch (err) {
       logger.debug(`Error message: ${err.message}`);
       logger.debug(`Error code: ${err.code}`);
 
-      const error = {
+      return res.status(400).json({
         status: 400,
-        result: err.message,
-      };
-      next(error);
+        results: err.message,
+      });
     }
   },
 

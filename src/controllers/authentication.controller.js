@@ -64,7 +64,7 @@ module.exports = {
                 );
               } else {
                 logger.info("User not found or password invalid");
-                res.status(401).json({
+                res.status(400).json({
                   message: "User not found or password invalid",
                   datetime: new Date().toISOString(),
                 });
@@ -92,7 +92,7 @@ module.exports = {
       );
       next();
     } catch (ex) {
-      res.status(422).json({
+      res.status(400).json({
         error: ex.toString(),
         datetime: new Date().toISOString(),
       });

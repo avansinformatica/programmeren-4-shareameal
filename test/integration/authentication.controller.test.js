@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "dubug"; //"warn";
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -9,6 +9,7 @@ require("dotenv").config();
 const dbconnection = require("../../src/database/dbconnection");
 const jwt = require("jsonwebtoken");
 const { jwtSecretKey, logger } = require("../../src/config/config");
+const { expect } = require("chai");
 
 chai.should();
 chai.use(chaiHttp);
@@ -76,7 +77,9 @@ describe("Manage login", () => {
         .send({ emailAdress: "name@server.nl", password: "secret" })
         .end((err, res) => {
           logger.info(res.body);
-          token = res.body.results.token;
+          if (token) {
+            token = res.body.results.token;
+          }
           logger.info(token);
         });
     });
@@ -85,8 +88,69 @@ describe("Manage login", () => {
     //it.skip if you only want to skip this test
 
     // UC 101-1 t/m 101-4
+    it("TC-101-1 Verplicht veld ontbreekt", (done) => {
+      chai
+        .request(server)
+        .post("/api/auth/login")
+        .send({ password: "secret" })
+        .end((err, res) => {
+          logger.info(res.body);
+          res.should.have.status(400);
+          logger.debug("res.body.error=");
+          logger.info(res.body.error);
+          expect(res.body.error).to.equal(
+            "AssertionError [ERR_ASSERTION]: email must be a string."
+          );
+          done();
+        });
+    });
 
-    it.only("UC-101-5 User succesfully logged in, return 200 status", (done) => {
+    it("TC-101-2 Niet-valide email adres", (done) => {
+      chai
+        .request(server)
+        .post("/api/auth/login")
+        .send({ emailAdress: "nameserver.nl", password: "secret" })
+        .end((err, res) => {
+          logger.info(res.body);
+          res.should.have.status(400);
+          expect(res.body.message).to.equal(
+            "User not found or password invalid"
+          );
+          done();
+        });
+    });
+
+    it("TC-101-3 Niet-valide wachtwoord", (done) => {
+      chai
+        .request(server)
+        .post("/api/auth/login")
+        .send({ emailAdress: "name@server.nl", password: "notsosecret" })
+        .end((err, res) => {
+          logger.info(res.body);
+          res.should.have.status(400);
+          expect(res.body.message).to.equal(
+            "User not found or password invalid"
+          );
+          done();
+        });
+    });
+
+    it("TC-101-4 Gebruiker bestaat niet", (done) => {
+      chai
+        .request(server)
+        .post("/api/auth/login")
+        .send({ emailAdress: "user@bestaatniet.nl", password: "secret" })
+        .end((err, res) => {
+          logger.info(res.body);
+          res.should.have.status(400);
+          expect(res.body.message).to.equal(
+            "User not found or password invalid"
+          );
+          done();
+        });
+    });
+
+    it("TC-101-5 User succesfully logged in", (done) => {
       chai
         .request(server)
         .post("/api/auth/login")

@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //debug
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -9,6 +9,7 @@ require("dotenv").config();
 const dbconnection = require("../../src/database/dbconnection");
 const jwt = require("jsonwebtoken");
 const { jwtSecretKey, logger } = require("../../src/config/config");
+const { getSystemErrorMap } = require("util");
 
 chai.should();
 chai.use(chaiHttp);
@@ -28,7 +29,7 @@ const CLEAR_DB =
  */
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES" +
-  '(1, "first", "last", "name@server.nl", "secret", "street", "city");';
+  '(1, "first", "last", "name@server.nl", "Password123$", "street", "city");';
 
 /**
  * Query om twee meals toe te voegen. Let op de cookId, die moet matchen
@@ -61,57 +62,32 @@ describe("UC-201 add users /api/user", () => {
     });
   });
 
-  //it.only when you only want to run this test
-  //it.skip if you only want to skip this test
-
   // DONE
-  it("UC-201-1 When a required input is missing, a valid error should be returned 400", (done) => {
+  it.only("TC-201-1 Verplicht veld ontbreekt", (done) => {
     logger.debug("beforeEach called");
     // maak de testdatabase opnieuw aan zodat we onze testen kunnen uitvoeren.
     chai
       .request(server)
-      .get("/api/movie")
-      .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+      .post("/api/user")
+      .send({
+        //first name ontbreekt
+        lastName: "Wante",
+        emailAdress: "wante@student.avans.nl",
+        password: "P@ssw0rd123",
+      })
       .end((err, res) => {
-        assert.ifError(err);
-
-        res.should.have.status(200);
+        logger.info(res.body);
         res.should.be.an("object");
-
-        res.body.should.be
-          .an("object")
-          .that.has.all.keys("results", "statusCode");
-
-        const { statusCode, results } = res.body;
-        statusCode.should.be.an("number");
-        results.should.be.an("array").that.has.length(2);
-        results[0].name.should.equal("Meal A");
-        results[0].id.should.equal(1);
+        let { status, result } = res.body;
+        status.should.equals(400);
+        res.body.results.should.be
+          .a("string")
+          .that.equals("First Name must be a string");
         done();
       });
   });
 
-  // chai
-  //   .request(server)
-  //   .post("/api/user")
-  //   .send({
-  //     //first name ontbreekt
-  //     lastName: "Wante",
-  //     emailAdress: "wante@student.avans.nl",
-  //     password: "P@ssw0rd123",
-  //   })
-  //   .end((err, res) => {
-  //     res.should.be.an("object");
-  //     let { status, result } = res.body;
-  //     status.should.equals(400);
-  //     result.should.be
-  //       .a("string")
-  //       .that.equals("First Name must be a string");
-  //     done();
-  //   });
-
-  // DONE
-  it("UC-201-2 When a non-valid email address is send, a valid error should be returned 400", (done) => {
+  it.only("TC-201-2 Niet-valide email adres", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -129,17 +105,15 @@ describe("UC-201 add users /api/user", () => {
       .end((err, res) => {
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(400);
-        result.should.be
+        res.should.have.status(400);
+        res.body.message.should.be
           .a("string")
           .that.equals("Email Address must contain an @ symbol and a dot");
         done();
       });
   });
 
-  //TODO: WAAR MOET HET PASSWORD AAN VOLDOEN? NU ALLEEN FOUT ALS PW: "password" IS
-  // DONE
-  it("UC-201-3 When a invalid password is provided, a valid error should be returned 400", (done) => {
+  it.only("TC-201-3 Niet-valide wachtwoord", (done) => {
     chai
       .request(server)
       .post("/api/user")
@@ -155,21 +129,25 @@ describe("UC-201 add users /api/user", () => {
         phoneNumber: "0612345678",
       })
       .end((err, res) => {
+        logger.info("res.body = ");
+        logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
         status.should.equals(400);
-        result.should.be.a("string").that.equals("Password is invalid");
+        res.body.message.should.be
+          .a("string")
+          .that.equals(
+            "Password should have at least eight characters, at least one letter, one number and one special character."
+          );
         done();
       });
   });
 
-  // DONE
-  it("UC-201-4 When user already exists, a valid error should be returned 409", (done) => {
+  it.only("TC-201-5 Gebruiker succesvol geregistreerd", (done) => {
     chai
       .request(server)
       .post("/api/user")
       .send({
-        //
         firstName: "Anika",
         lastName: "Wante",
         street: "Academiesingel 17",
@@ -180,35 +158,66 @@ describe("UC-201 add users /api/user", () => {
         phoneNumber: "0612345678",
       })
       .end((err, res) => {
+        logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(400);
-        result.should.be.a("string").that.equals("User already exists");
+        res.should.have.status(201);
         done();
       });
   });
 
-  // DONE
-  it("UC-201-5 User successfully registered, return 201 response", (done) => {
-    chai
-      .request(server)
-      .post("/api/user")
-      .send({
-        //
-        firstName: "Anika",
-        lastName: "Wante",
-        street: "Academiesingel 17",
-        city: "Breda",
-        isActive: true,
-        emailAdress: "test@student.avans.nl",
-        password: "P@ssw0rd123",
-        phoneNumber: "0612345678",
-      })
-      .end((err, res) => {
-        res.should.be.an("object");
-        let { status, result } = res.body;
-        status.should.equals(201);
-        done();
+  describe("TC 201-4 Insert existing user", () => {
+    beforeEach((done) => {
+      logger.debug("beforeEach called");
+      // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+      dbconnection.getConnection(function (err, connection) {
+        if (err) next(err); // not connected!
+
+        // Use the connection
+        connection.query(
+          CLEAR_DB + INSERT_USER,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
+
+            // Handle error after the release.
+            if (error) next(err);
+            // done() aanroepen nu je de query callback eindigt.
+            logger.debug("beforeEach done");
+            done();
+          }
+        );
       });
+    });
+
+    it.only("TC-201-4 Gebruiker bestaat al", (done) => {
+      logger.debug("in 201-4");
+
+      chai
+        .request(server)
+        .post("/api/user")
+        .send({
+          //
+          firstName: "first",
+          lastName: "last",
+          street: "street",
+          city: "city",
+          isActive: true,
+          emailAdress: "name@server.nl",
+          password: "Password123$",
+          phoneNumber: "0612345678",
+        })
+        .end((err, res) => {
+          logger.debug("res.body");
+          logger.debug(res.body);
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          res.should.have.status(409);
+          res.body.message.should.be
+            .a("string")
+            .that.equals("User already exists");
+          done();
+        });
+    });
   });
 });
