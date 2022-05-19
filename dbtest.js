@@ -242,3 +242,56 @@ describe("Movies API", () => {
     // En hier komen meer testcases
   });
 });
+
+//
+var token;
+
+beforeEach((done) => {
+  logger.debug("beforeEach called");
+  // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+  dbconnection.getConnection(function (err, connection) {
+    if (err) throw err; // not connected!
+
+    connection.query(CLEAR_DB, function (error, result, field) {
+      if (error) throw error;
+      connection.query(
+        INSERT_USER + INSERT_SECONDUSER,
+        function (error, result, field) {
+          if (error) throw error;
+          connection.release();
+          done();
+        }
+      );
+    });
+  });
+
+  chai
+    .request(server)
+    .post("/api/auth/login")
+    .send({ emailAdress: "name@server.nl", password: "secret" })
+    .end((err, res) => {
+      logger.info(res.body);
+      if (res.body.results.token) {
+        //?
+        token = res.body.results.token;
+      }
+      logger.info(token);
+    });
+});
+
+it("UC-202-2 Toon twee gebruikers", (done) => {
+  chai
+    .request(server)
+    .get("/api/user")
+    .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+    .end((err, res) => {
+      logger.info("res.body = " + res.body);
+      logger.info(res.body);
+      res.should.be.an("object");
+      let { status, result } = res.body;
+      res.should.have.status(200);
+      res.body.results.should.be.a("array");
+      res.body.results.length.should.be.eql(2);
+      done();
+    });
+});
