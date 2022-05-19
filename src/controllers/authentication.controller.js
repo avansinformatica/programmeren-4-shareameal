@@ -129,7 +129,8 @@ module.exports = {
           logger.debug("token is valid", payload);
           // User heeft toegang. Voeg UserId uit payload toe aan
           // request, voor ieder volgend endpoint.
-          req.userId = payload.userId;
+          req.userId = payload.id;
+          logger.info("User id: " + req.userId);
           next();
         }
       });

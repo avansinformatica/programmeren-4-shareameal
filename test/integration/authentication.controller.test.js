@@ -84,9 +84,6 @@ describe("Manage login", () => {
         });
     });
 
-    //it.only when you only want to run this test
-    //it.skip if you only want to skip this test
-
     // UC 101-1 t/m 101-4
     it("TC-101-1 Verplicht veld ontbreekt", (done) => {
       chai

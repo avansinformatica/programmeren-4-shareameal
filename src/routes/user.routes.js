@@ -21,21 +21,19 @@ router.get(
   userController.getAllUsers
 );
 
-// UC-204 Get singel user by ID
-router.get("/api/user/:userId", userController.getUserById);
-
-// NOT! IN CONTROLLER YET!!!!!!!!!!!!
 // UC-203 Request personal user profile
-//    de user is ingelogd, het request bevat
-//    een JWT met userId
-//    - Error response: code 401 statusCode
-//      + message
-router.get("/api/user/profile", (req, res, next) => {
-  res.status(404).json({
-    status: 404,
-    result: `Dit endpoint is nog niet gerealiseerd`,
-  });
-});
+router.get(
+  "/api/user/profile",
+  authenticationController.validateToken,
+  userController.getUserProfile
+);
+
+// UC-204 Get singel user by ID
+router.get(
+  "/api/user/:userId",
+  authenticationController.validateToken,
+  userController.getUserById
+);
 
 // UC-205 Update a single user
 router.put(

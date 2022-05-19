@@ -40,55 +40,77 @@ const INSERT_MEALS =
   "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);";
 
 // UC-203 = Request personal user profile
-describe("UC-203 * Request userprofile /api/user/??profile or :userId", () => {
+describe("UC-203 * Request userprofile /api/user/profile", () => {
   beforeEach((done) => {
-    database = [];
-    done();
-  });
+    logger.debug("beforeEach called");
+    // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err; // not connected!
 
-  // //TODO (nog niet voor inlevermoment 2 want endpoint nog niet gerealiseerd)
-  it("UC-203-1 Invalid token, return 404 response", (done) => {
+      // Use the connection
+      connection.query(
+        CLEAR_DB + INSERT_USER,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) next(err);
+          // done() aanroepen nu je de query callback eindigt.
+          logger.debug("beforeEach done");
+          done();
+        }
+      );
+    });
+
     chai
       .request(server)
-      .post("/api/user")
-      .send({
-        //first name ontbreekt
-        lastName: "Wante",
-        emailAdress: "wante@student.avans.nl",
-        password: "P@ssw0rd123",
-      })
+      .post("/api/auth/login")
+      .send({ emailAdress: "name@server.nl", password: "secret" })
+      .end((err, res) => {
+        logger.info(res.body);
+      });
+  });
+
+  it.only("UC-203-1 Invalid token, return 401 response", (done) => {
+    chai
+      .request(server)
+      .get("/api/user/profile")
+      .set("authorization", "Bearer " + jwt.sign({ id: 1 }, "123456"))
       .end((err, res) => {
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(200);
-        result.should.be.a("string").that.equals("First Name must be a string");
+        res.should.have.status(401);
+        res.body.error.should.be.a("string");
+        res.body.error.should.eql("Not authorized");
         done();
       });
   });
 
-  // //TODO (nog niet voor inlevermoment 2 want endpoint nog niet gerealiseerd)
-  it("UC-203-2 Valid token and user exists, return 200 response", (done) => {
+  it.only("UC-203-2 Valid token and user exists, return 200 response", (done) => {
     chai
       .request(server)
-      .post("/api/user")
-      .send({
-        //fout email address
-        firstName: "Anika",
-        lastName: "Wante",
-        street: "Academiesingel 17",
-        city: "Breda",
-        isActive: true,
-        emailAdress: "wantestudent.avans.nl",
-        password: "P@ssw0rd123",
-        phoneNumber: "0612345678",
-      })
+      .get("/api/user/profile")
+      .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
       .end((err, res) => {
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(400);
-        result.should.be
-          .a("string")
-          .that.equals("Email Address must contain an @ symbol and a dot");
+        res.should.have.status(200);
+        res.body.results.should.be.a("object");
+        logger.error("**************res.body = " + res.body);
+        logger.info(res.body);
+        res.body.results.should.eql({
+          id: 1,
+          firstName: "first",
+          lastName: "last",
+          isActive: 1,
+          emailAdress: "name@server.nl",
+          password: "secret",
+          phoneNumber: "-",
+          roles: "editor,guest",
+          street: "street",
+          city: "city",
+        });
         done();
       });
   });

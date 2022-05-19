@@ -69,32 +69,35 @@ module.exports = {
     logger.debug("getAllUsers aangeroepen");
 
     const queryParams = req.query;
+    const searchParams = [];
     logger.debug(queryParams);
 
     // TODO welke 2 dit worden wordt bepaald
-    let { name, isActive } = req.query;
-    let queryString = "SELECT `id`, `name` FROM `meal`";
-    if (name || isActive) {
+    let { lastName, isActive } = req.query;
+    let queryString = "SELECT * FROM `user`";
+    if (lastName || isActive) {
       queryString += " WHERE ";
-      if (name) {
-        queryString += "`name` LIKE ?";
-        name = "%" + name + "%";
+      if (lastName) {
+        queryString += "`lastName` LIKE ?";
+        lastName = "%" + lastName + "%";
+        searchParams.push(lastname);
       }
-      if (name && isActive) queryString += " AND ";
+      if (lastName && isActive) queryString += " AND ";
       if (isActive) {
         queryString += "`isActive` = ?";
+        searchParams.push(isActive ? 1 : 0);
       }
     }
     queryString += ";";
+    console.log("string query");
     logger.debug(`queryString = ${queryString}`);
-
     dbconnection.getConnection(function (err, connection) {
       if (err) next(err); // not connected!
 
       // Use the connection
       connection.query(
         queryString,
-        [name, isActive],
+        searchParams,
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();
@@ -103,6 +106,7 @@ module.exports = {
           if (error) next(error);
 
           // Don't use the connection here, it has been returned to the pool.
+          logger.debug(results);
           logger.debug("#results = ", results.length);
           logger.debug(results);
           res.status(200).json({
@@ -115,6 +119,38 @@ module.exports = {
   },
 
   //UC-203?? -- "/api/user/profile" nog niet gerealiseerd (zie routes)
+  getUserProfile: (req, res, next) => {
+    logger.debug("getUserProfile aangeroepen");
+    dbconnection.getConnection(function (err, connection) {
+      if (err) next(err); // not connected!
+
+      logger.info(req.userId);
+
+      let user = req.userId;
+      // Use the connection
+      connection.query(
+        "SELECT * FROM `user` WHERE `id` = ?;",
+        [user],
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) {
+            throw error;
+          } else {
+            let resultUser = results[0];
+
+            logger.debug("#results = ", results.length);
+            res.status(200).json({
+              statusCode: 200,
+              results: resultUser,
+            });
+          }
+        }
+      );
+    });
+  },
 
   //validateUser
   validateUser: (req, res, next) => {
