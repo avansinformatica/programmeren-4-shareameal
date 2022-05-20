@@ -8,7 +8,6 @@ let id = 0;
 
 module.exports = {
   //validate meal
-
   validateMeal: (req, res, next) => {
     const {
       name,
@@ -43,6 +42,7 @@ module.exports = {
       });
     }
   },
+
   // UC-301 Create meal
   addMeal: (req, res) => {
     logger.info("addMeal aangeroepen");
@@ -77,12 +77,12 @@ module.exports = {
 
           if (error) throw error;
           if (error) {
-            // res.status(409).json({
-            //   status: 409,
-            //   message: `Meal already exists`,
-            // });
+            res.status(409).json({
+              status: 409,
+              message: `Meal already exists`,
+            });
           } else {
-            // Get new user and send back as result
+            // Get new Meal and send back as result
             connection.query(
               `SELECT * FROM meal WHERE cookId = ?;`,
               [userId],
@@ -197,7 +197,15 @@ module.exports = {
             dbconnection.getConnection(function (err, connection) {
               if (err) next(err); // not connected!
 
-              if (mealId != req.userId) {
+              logger.debug("OOO mealId");
+              logger.debug(mealId);
+              logger.debug("OOO req.userId");
+              logger.debug(req.userId);
+              logger.debug("OOO results");
+              logger.debug(results);
+              logger.debug("OOO results[0].cookId");
+              logger.debug(results[0].cookId);
+              if (results[0].cookId != req.userId) {
                 return res.status(403).json({
                   status: 403,
                   message: `You are no owner of meal with id = ${mealId}`,

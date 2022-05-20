@@ -11,8 +11,8 @@ router.get("/", (req, res) => {
   });
 });
 
-/*
 // UC-302 Update meal //OPTIONEEL
+/*
 router.put(
   "/api/meal/:mealId",
   authenticationController.validateToken,
@@ -20,6 +20,7 @@ router.put(
   mealController.updateSingleMeal
 );
 */
+
 // UC-303 Get all meals
 router.get("/api/meal", mealController.getAllMeals);
 
