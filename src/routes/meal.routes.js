@@ -12,8 +12,13 @@ router.get("/", (req, res) => {
 });
 
 // UC-301 Create meal
-router.post("/api/meal", mealController.validateUser, mealController.addMeal);
-
+router.post(
+  "/api/meal",
+  authenticationController.validateToken,
+  mealController.validateMeal,
+  mealController.addMeal
+);
+/*
 // UC-302 Update meal
 router.put(
   "/api/meal/:mealId",
@@ -21,14 +26,14 @@ router.put(
   mealController.validateMeal,
   mealController.updateSingleMeal
 );
-
+*/
 // UC-303 Get all meals
 router.get(
   "/api/meal",
-  authenticationController.validateToken,
+  // authenticationController.validateToken,
   mealController.getAllMeals
 );
-
+/*
 // UC-304 Get single meal details
 router.get(
   "/api/meal/:mealId",
@@ -42,5 +47,5 @@ router.delete(
   authenticationController.validateToken,
   mealController.deleteSingleMeal
 );
-
+*/
 module.exports = router;

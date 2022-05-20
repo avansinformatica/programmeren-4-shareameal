@@ -2,6 +2,7 @@ const express = require("express");
 const authRoutes = require("./src/routes/authentication.routes");
 const bodyParser = require("body-parser");
 const userRouter = require("./src/routes/user.routes");
+const mealRouter = require("./src/routes/meal.routes");
 const logger = require("./src/config/config").logger;
 const dbconnection = require("./src/database/dbconnection");
 const res = require("express/lib/response");
@@ -18,6 +19,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use(userRouter);
+app.use(mealRouter);
 app.use(authRoutes);
 
 app.all("*", (req, res) => {
