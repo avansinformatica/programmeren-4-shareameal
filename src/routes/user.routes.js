@@ -38,11 +38,16 @@ router.get(
 // UC-205 Update a single user
 router.put(
   "/api/user/:userId",
+  authenticationController.validateToken,
   userController.validateUser,
   userController.updateSingleUser
 );
 
 // UC-206 Delete a user
-router.delete("/api/user/:userId", userController.deleteSingleUser);
+router.delete(
+  "/api/user/:userId",
+  authenticationController.validateToken,
+  userController.deleteSingleUser
+);
 
 module.exports = router;

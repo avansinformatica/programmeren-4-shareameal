@@ -30,6 +30,10 @@ const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES" +
   '(1, "first", "last", "name@server.nl", "secret", "street", "city");';
 
+const INSERT_SECONDUSER =
+  "INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES" +
+  '(2, "second", "last", "namesecond@server.nl", "secret", "street", "city");';
+
 /**
  * Query om twee meals toe te voegen. Let op de cookId, die moet matchen
  * met een bestaande user in de database.
@@ -42,98 +46,98 @@ const INSERT_MEALS =
 //UC-206 = Delete a user
 describe("UC-206 ** Delete user /api/user/:userId", () => {
   beforeEach((done) => {
-    database = [];
-    done();
+    logger.debug("beforeEach called");
+    // maak de testdatabase leeg zodat we onze testen kunnen uitvoeren.
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err; // not connected!
+
+      // Use the connection
+      connection.query(
+        CLEAR_DB + INSERT_USER,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) next(err);
+          // done() aanroepen nu je de query callback eindigt.
+          logger.debug("beforeEach done");
+          done();
+        }
+      );
+    });
+
+    chai
+      .request(server)
+      .post("/api/auth/login")
+      .send({ emailAdress: "name@server.nl", password: "secret" })
+      .end((err, res) => {
+        logger.info(res.body);
+      });
   });
 
-  // DONE
   it("UC-206-1 User doesn't exist, return 400 response", (done) => {
     chai
       .request(server)
       .delete("/api/user/3")
       .end((err, res) => {
+        logger.info("206-4 res.body: ");
+        logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(404);
+        status.should.equals(400);
         result.should.be.a("string").that.equals("User with ID 3 not found");
         done();
       });
   });
 
-  //TODO (niet voor inlevermoment 2)
   it("UC-206-2 Not logged in, return 401 response", (done) => {
     chai
       .request(server)
-      .post("/api/user")
-      .send({
-        //fout email address
-        firstName: "Anika",
-        lastName: "Wante",
-        street: "Academiesingel 17",
-        city: "Breda",
-        isActive: true,
-        emailAdress: "wantestudent.avans.nl",
-        password: "P@ssw0rd123",
-        phoneNumber: "0612345678",
-      })
+      .put("/api/user/3")
+      .set("authorization", "Bearer " + "thisisatoken")
       .end((err, res) => {
+        logger.debug(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(400);
-        result.should.be
-          .a("string")
-          .that.equals("Email Address must contain an @ symbol and a dot");
+        res.should.have.status(401);
+        res.body.error.should.be.a("string").that.equals("Not authorized");
         done();
       });
   });
 
-  //TODO (niet voor inlevermoment 2)
   it("UC-206-3 Actor is no owner, return 403 response", (done) => {
     chai
       .request(server)
-      .post("/api/user")
-      .send({
-        //
-        firstName: "Anika",
-        lastName: "Wante",
-        street: "Academiesingel 17",
-        city: "Breda",
-        isActive: true,
-        emailAdress: "test@student.avans.nl",
-        password: "password",
-        phoneNumber: "0612345678",
-      })
+      .post("/api/user/3")
+      .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
       .end((err, res) => {
+        logger.info("206-4 res.body: ");
+        logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(400);
-        result.should.be.a("string").that.equals("Password is invalid");
+        status.should.equals(403);
+        result.should.be
+          .a("string")
+          .that.equals(`You are no owner of user with id = 3`);
         done();
       });
   });
 
-  // DONE
-  it("UC-206-4 User successfully deleted, return 200 response", (done) => {
+  it.only("UC-206-4 User successfully deleted, return 200 response", (done) => {
     chai
       .request(server)
-      .delete("/api/user/2")
+      .delete("/api/user/1")
+      .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
       .end((err, res) => {
+        logger.info("206-4 res.body: ");
+        logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
-        status.should.equals(200);
-        result.should.be.a("array").that.eql([
-          {
-            id: 1,
-            firstName: "Red",
-            lastName: "Bull",
-            street: "Straatje",
-            city: "Zandvoort",
-            isActive: true,
-            emailAdress: "red@bull.nl",
-            password: "RedBull=123",
-            phoneNumber: "0698876554",
-          },
-        ]);
+        res.should.have.status(200);
+        res.body.message.should.be
+          .a("string")
+          .that.eql("User is successfully deleted.");
         done();
       });
   });

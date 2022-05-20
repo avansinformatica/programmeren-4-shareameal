@@ -72,7 +72,7 @@ describe("UC-203 * Request userprofile /api/user/profile", () => {
       });
   });
 
-  it.only("UC-203-1 Invalid token, return 401 response", (done) => {
+  it("UC-203-1 Invalid token, return 401 response", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")
@@ -87,7 +87,7 @@ describe("UC-203 * Request userprofile /api/user/profile", () => {
       });
   });
 
-  it.only("UC-203-2 Valid token and user exists, return 200 response", (done) => {
+  it("UC-203-2 Valid token and user exists, return 200 response", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")

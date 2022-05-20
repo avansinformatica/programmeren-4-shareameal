@@ -1,6 +1,8 @@
 const dbconnection = require("../database/dbconnection");
 const logger = require("../config/config").logger;
 const assert = require("assert");
+const { validateToken } = require("./authentication.controller");
+const { getSystemErrorMap } = require("util");
 
 let id = 0;
 
@@ -118,7 +120,7 @@ module.exports = {
     });
   },
 
-  //UC-203?? -- "/api/user/profile" nog niet gerealiseerd (zie routes)
+  //getUserProfile UC-203
   getUserProfile: (req, res, next) => {
     logger.debug("getUserProfile aangeroepen");
     dbconnection.getConnection(function (err, connection) {
@@ -188,6 +190,7 @@ module.exports = {
           message: "Email Address must contain an @ symbol and a dot",
         });
       }
+
       function validatePassword(password) {
         var re =
           /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/i;
@@ -199,6 +202,18 @@ module.exports = {
           status: 400,
           message:
             "Password should have at least eight characters, at least one letter, one number and one special character.",
+        });
+      }
+
+      function validatePhoneNumber(phoneNumber) {
+        var re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i;
+        return re.test(phoneNumber);
+      }
+
+      if (!validatePhoneNumber(req.body.phoneNumber)) {
+        return res.status(400).json({
+          status: 400,
+          message: "Phone number is invalid.",
         });
       }
 
@@ -235,6 +250,13 @@ module.exports = {
           // Handle error after the release.
           if (error) next(error);
 
+          if (results.length <= 0) {
+            return res.status(404).json({
+              status: 404,
+              message: `User with ID ${userId} not found`,
+            });
+          }
+
           // Don't use the connection here, it has been returned to the pool.
           logger.debug("#results = ", results.length);
           res.status(200).json({
@@ -248,8 +270,6 @@ module.exports = {
 
   //updateSingleUser UC-205
   updateSingleUser: (req, res, next) => {
-    //TODO validate on correctness data, alle velden behalve id? neem je sws al niet mee
-
     let user = req.body;
 
     logger.debug("updateSingleUser aangeroepen");
@@ -257,35 +277,78 @@ module.exports = {
     const userId = req.params.userId;
     logger.debug(`User met ID ${userId} gezocht`);
 
+    if (userId != req.userId) {
+      return res.status(400).json({
+        status: 400,
+        message: `You can't delete user with id ${userId}`,
+      });
+    }
+
     dbconnection.getConnection(function (err, connection) {
       if (err) next(err);
 
       // Use the connection
       connection.query(
-        "UPDATE `user` SET `firstName` = ?, `lastName` = ?, `street` = ?, `city` = ?, `isActive` = ?, `emailAdress` = ?, `password` = ?, `phoneNumber` = ? WHERE `id` = ?;",
-        [
-          user.firstName,
-          user.lastName,
-          user.street,
-          user.city,
-          user.isActive,
-          user.emailAdress,
-          user.password,
-          user.phoneNumber,
-        ],
+        "SELECT * FROM user WHERE `id` = ?;",
+        [userId],
         function (error, results, fields) {
-          // When done with the connection, release it.
           connection.release();
 
-          // Handle error after the release.
-          if (error) next(error);
+          if (results.length <= 0) {
+            return res.status(400).json({
+              status: 400,
+              message: `User with ID ${userId} not found`,
+            });
+          } else {
+            connection.query(
+              "UPDATE `user` SET `firstName` = ?, `lastName` = ?, `street` = ?, `city` = ?, `isActive` = ?, `emailAdress` = ?, `password` = ?, `phoneNumber` = ? WHERE `id` = ?;",
+              [
+                user.firstName,
+                user.lastName,
+                user.street,
+                user.city,
+                user.isActive,
+                user.emailAdress,
+                user.password,
+                user.phoneNumber,
+                userId,
+              ],
+              function (error, results, fields) {
+                // When done with the connection, release it.
+                connection.release();
 
-          // Don't use the connection here, it has been returned to the pool.
-          logger.debug("#results = ", results.length);
-          res.status(200).json({
-            statusCode: 200,
-            results: results,
-          });
+                // Handle error after the release.
+                if (error) throw error;
+
+                if (results.length <= 0) {
+                  return res.status(400).json({
+                    status: 400,
+                    message: `User with ID ${userId} not found`,
+                  });
+                }
+
+                // Don't use the connection here, it has been returned to the pool.
+                logger.debug("#results = ", results.length);
+
+                // Get new user and send back as result
+                connection.query(
+                  "SELECT * FROM user WHERE `id` = ?;",
+                  [userId],
+                  function (error, results, fields) {
+                    connection.release();
+
+                    let resultUser = results[0];
+
+                    logger.debug("#results = ", results.length);
+                    res.status(200).json({
+                      statusCode: 200,
+                      results: resultUser,
+                    });
+                  }
+                );
+              }
+            );
+          }
         }
       );
     });
@@ -293,8 +356,16 @@ module.exports = {
 
   //deleteSingleUser UC-206
   deleteSingleUser: (req, res, next) => {
-    const userId = req.params.userId;
     logger.debug(`User met ID ${userId} wordt gezocht`);
+
+    const userId = req.params.userId;
+
+    if (userId != req.userId) {
+      return res.status(403).json({
+        status: 403,
+        message: `You are no owner of user with id = ${userId}`,
+      });
+    }
 
     dbconnection.getConnection(function (err, connection) {
       if (err) next(err); // not connected!
@@ -310,11 +381,14 @@ module.exports = {
           // Handle error after the release.
           if (error) next(error);
 
+          logger.debug("################");
+          logger.debug(results);
+
           // Don't use the connection here, it has been returned to the pool.
           logger.debug("#results = ", results.length);
           res.status(200).json({
             statusCode: 200,
-            results: results,
+            message: "User is successfully deleted.",
           });
         }
       );
