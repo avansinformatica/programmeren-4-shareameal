@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //warn
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -116,18 +116,6 @@ describe("UC-202-2 Overzicht van gebruikers, return 2 users", () => {
           }
         );
       });
-
-      // // Use the connection
-      // connection.query(CLEAR_DB, function (error, results, fields) {
-      //   // When done with the connection, release it.
-      //   connection.release();
-
-      //   // Handle error after the release.
-      //   if (error) throw err;
-      //   // done() aanroepen nu je de query callback eindigt.
-      //   logger.debug("beforeEach done");
-      //   done();
-      // });
     });
 
     chai
@@ -189,13 +177,15 @@ describe("UC-202-3/6 Overzicht van gebruikers, return 1 user", () => {
     chai
       .request(server)
       .post("/api/auth/login")
-      .send({ emailAdress: "name@server.nl", password: "Password123$" })
+      .send({ emailAdress: "name@server.nl", password: "secret" })
       .end((err, res) => {
         logger.info(res.body);
         if (token) {
-          token = res.body.results.token;
+          logger.info(
+            "token is received !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:)"
+          );
         }
-        logger.info(token);
+        // logger.info(token);
       });
   });
 

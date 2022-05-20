@@ -70,55 +70,116 @@ module.exports = {
   getAllUsers: (req, res, next) => {
     logger.debug("getAllUsers aangeroepen");
 
-    const queryParams = req.query;
-    const searchParams = [];
-    logger.debug(queryParams);
-
-    // TODO welke 2 dit worden wordt bepaald
-    let { lastName, isActive } = req.query;
-    let queryString = "SELECT * FROM `user`";
-    if (lastName || isActive) {
-      queryString += " WHERE ";
-      if (lastName) {
-        queryString += "`lastName` LIKE ?";
-        lastName = "%" + lastName + "%";
-        searchParams.push(lastname);
-      }
-      if (lastName && isActive) queryString += " AND ";
-      if (isActive) {
-        queryString += "`isActive` = ?";
-        searchParams.push(isActive ? 1 : 0);
-      }
-    }
-    queryString += ";";
-    console.log("string query");
-    logger.debug(`queryString = ${queryString}`);
     dbconnection.getConnection(function (err, connection) {
       if (err) next(err); // not connected!
+      const queryParams = req.query;
+      const searchParams = [];
 
-      // Use the connection
-      connection.query(
-        queryString,
-        searchParams,
-        function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-
-          // Handle error after the release.
-          if (error) next(error);
-
-          // Don't use the connection here, it has been returned to the pool.
-          logger.debug(results);
-          logger.debug("#results = ", results.length);
-          logger.debug(results);
-          res.status(200).json({
-            statusCode: 200,
-            results: results,
-          });
+      // TODO welke 2 dit worden wordt bepaald
+      let { lastName, isActive } = req.query;
+      let queryString = "SELECT * FROM `user`";
+      if (lastName || isActive) {
+        queryString += " WHERE ";
+        if (lastName) {
+          queryString += "`lastName` LIKE ?";
+          lastName = "%" + lastName + "%";
+          searchParams.push(lastName);
         }
-      );
+        if (lastName && isActive) queryString += " AND ";
+        if (isActive) {
+          queryString += "`isActive` = ?";
+          searchParams.push(isActive == "true" ? 1 : 0);
+          logger.debug(searchParams);
+        }
+      }
+      queryString += ";";
+      console.log("string query");
+      logger.debug(`queryString = ${queryString}`);
+      dbconnection.getConnection(function (err, connection) {
+        if (err) next(err); // not connected!
+
+        // Use the connection
+        connection.query(
+          queryString,
+          searchParams,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
+
+            // Handle error after the release.
+            if (error) next(error);
+
+            // Don't use the connection here, it has been returned to the pool.
+            logger.debug("#results = ", results.length);
+            logger.debug(results);
+            res.status(200).json({
+              statusCode: 200,
+              results: results,
+            });
+          }
+        );
+      });
     });
   },
+
+  // getAllUsers: (req, res, next) => {
+  //   logger.debug("getAllUsers aangeroepen");
+
+  //   const queryParams = req.query;
+  //   logger.debug("U see this????????????????????");
+  //   logger.debug(queryParams);
+  //   const searchParams = [];
+
+  //   dbconnection.getConnection(function (err, connection) {
+  //     if (err) next(err); // not connected!
+
+  //     // TODO welke 2 dit worden wordt bepaald
+  //     let { lastName, isActive } = req.query;
+  //     let queryString = "SELECT * FROM `user`";
+
+  //     logger.error(lastname);
+
+  //     if (lastName || isActive) {
+  //       queryString += " WHERE ";
+  //       if (lastName) {
+  //         queryString += "`lastName` LIKE ?";
+  //         lastName = "%" + lastName + "%";
+  //         searchParams.push(lastname);
+  //       }
+  //       if (lastName && isActive) queryString += " AND ";
+  //       if (isActive) {
+  //         queryString += "`isActive` = ?";
+  //         searchParams.push(isActive ? 1 : 0);
+  //       }
+  //     }
+
+  //     queryString += ";";
+  //     console.log("string query");
+  //     logger.debug(`queryString = ${queryString}`);
+
+  //     // Use the connection
+  //     connection.query(
+  //       queryString,
+  //       searchParams,
+  //       function (error, results, fields) {
+  //         // When done with the connection, release it.
+  //         connection.release();
+
+  //         // Handle error after the release.
+  //         if (error) next(error);
+
+  //         // Don't use the connection here, it has been returned to the pool.
+  //         logger.debug(results);
+  //         logger.debug("#results = ", results.length);
+  //         logger.debug(results);
+  //         res.status(200).json({
+  //           statusCode: 200,
+  //           results: results,
+  //         });
+  //       }
+  //     );
+  //   });
+  // },
 
   //getUserProfile UC-203
   getUserProfile: (req, res, next) => {
@@ -356,23 +417,17 @@ module.exports = {
 
   //deleteSingleUser UC-206
   deleteSingleUser: (req, res, next) => {
-    logger.debug(`User met ID ${userId} wordt gezocht`);
+    logger.debug("delteSingleUser aangeroepen");
 
     const userId = req.params.userId;
-
-    if (userId != req.userId) {
-      return res.status(403).json({
-        status: 403,
-        message: `You are no owner of user with id = ${userId}`,
-      });
-    }
+    logger.debug(`User met ID ${userId} wordt gezocht`);
 
     dbconnection.getConnection(function (err, connection) {
       if (err) next(err); // not connected!
 
       // Use the connection
       connection.query(
-        "DELETE FROM `user` WHERE `id` = ?",
+        "SELECT * FROM user WHERE id = ?",
         [userId],
         function (error, results, fields) {
           // When done with the connection, release it.
@@ -381,15 +436,47 @@ module.exports = {
           // Handle error after the release.
           if (error) next(error);
 
-          logger.debug("################");
-          logger.debug(results);
-
           // Don't use the connection here, it has been returned to the pool.
           logger.debug("#results = ", results.length);
-          res.status(200).json({
-            statusCode: 200,
-            message: "User is successfully deleted.",
-          });
+          logger.debug("#results = ", results);
+          if (results.length > 0) {
+            dbconnection.getConnection(function (err, connection) {
+              if (err) next(err); // not connected!
+
+              if (userId != req.userId) {
+                return res.status(403).json({
+                  status: 403,
+                  message: `You are no owner of user with id = ${userId}`,
+                });
+              }
+
+              // Use the connection
+              connection.query(
+                "DELETE FROM user WHERE id = ?",
+                [userId],
+                function (error, results, fields) {
+                  // When done with the connection, release it.
+                  connection.release();
+
+                  // Handle error after the release.
+                  if (error) next(error);
+
+                  // Don't use the connection here, it has been returned to the pool.
+                  logger.debug("#results = ", results.length);
+                  logger.debug("#results = ", results);
+                  res.status(200).json({
+                    statusCode: 200,
+                    results: `User with id ${userId} is successfully deleted`,
+                  });
+                }
+              );
+            });
+          } else {
+            res.status(400).json({
+              statusCode: 400,
+              results: `User with ID ${userId} not found`,
+            });
+          }
         }
       );
     });

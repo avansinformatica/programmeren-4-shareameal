@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //"warn";
+process.env.LOGLEVEL = "warn"; //"warn";
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
