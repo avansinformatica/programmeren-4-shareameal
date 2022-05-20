@@ -11,15 +11,8 @@ router.get("/", (req, res) => {
   });
 });
 
-// UC-301 Create meal
-router.post(
-  "/api/meal",
-  authenticationController.validateToken,
-  mealController.validateMeal,
-  mealController.addMeal
-);
 /*
-// UC-302 Update meal
+// UC-302 Update meal //OPTIONEEL
 router.put(
   "/api/meal/:mealId",
   authenticationController.validateToken,
@@ -28,18 +21,10 @@ router.put(
 );
 */
 // UC-303 Get all meals
-router.get(
-  "/api/meal",
-  // authenticationController.validateToken,
-  mealController.getAllMeals
-);
-/*
+router.get("/api/meal", mealController.getAllMeals);
+
 // UC-304 Get single meal details
-router.get(
-  "/api/meal/:mealId",
-  authenticationController.validateToken,
-  mealController.getMealById
-);
+router.get("/api/meal/:mealId", mealController.getMealById);
 
 // UC-305 Delete a meal
 router.delete(
@@ -47,5 +32,13 @@ router.delete(
   authenticationController.validateToken,
   mealController.deleteSingleMeal
 );
-*/
+
+// UC-301 Create meal
+router.post(
+  "/api/meal",
+  authenticationController.validateToken,
+  mealController.validateMeal,
+  mealController.addMeal
+);
+
 module.exports = router;

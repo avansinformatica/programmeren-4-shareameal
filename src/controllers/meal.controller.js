@@ -84,17 +84,17 @@ module.exports = {
           } else {
             // Get new user and send back as result
             connection.query(
-              `SELECT * FROM user WHERE id = ?;`,
+              `SELECT * FROM meal WHERE cookId = ?;`,
               [userId],
               function (error, results, fields) {
                 connection.release();
 
-                let resultUser = results[0];
+                let resultMeal = results[0];
 
                 logger.debug("#results = ", results.length);
                 res.status(201).json({
                   statusCode: 201,
-                  results: resultUser,
+                  results: resultMeal,
                 });
               }
             );
@@ -104,7 +104,7 @@ module.exports = {
     });
   },
 
-  // UC-302 Update meal
+  // UC-302 Update meal (OPTIONEEL)
 
   // UC-303 Get all meals
   getAllMeals: (req, res) => {
@@ -132,8 +132,107 @@ module.exports = {
       });
     });
   },
+
+  // UC-304 Get single meal details
+  getMealById: (req, res) => {
+    logger.debug("getMealById aangeroepen");
+
+    const mealId = req.params.mealId;
+    logger.debug(`Meal met ID ${mealId} gezocht`);
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) next(err); // not connected!
+
+      // Use the connection
+      connection.query(
+        "SELECT * FROM `meal` WHERE `id` = ?",
+        [mealId],
+        function (error, results, fields) {
+          connection.release();
+
+          if (error) next(error);
+
+          if (results.length <= 0) {
+            return res.status(404).json({
+              status: 404,
+              message: `Meal with ID ${mealId} not found`,
+            });
+          }
+
+          logger.debug("#results = ", results.length);
+          res.status(200).json({
+            statusCode: 200,
+            results: results,
+          });
+        }
+      );
+    });
+  },
+
+  // UC-305 Delete a meal
+  deleteSingleMeal: (req, res) => {
+    logger.debug("delteSingleMeal aangeroepen");
+
+    const mealId = req.params.mealId;
+    logger.debug(`Meal met ID ${mealId} wordt gezocht`);
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) next(err); // not connected!
+
+      // Use the connection
+      connection.query(
+        "SELECT * FROM meal WHERE id = ?",
+        [mealId],
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) next(error);
+
+          // Don't use the connection here, it has been returned to the pool.
+          logger.debug("#results = ", results.length);
+          logger.debug("#results = ", results);
+          if (results.length > 0) {
+            dbconnection.getConnection(function (err, connection) {
+              if (err) next(err); // not connected!
+
+              if (mealId != req.userId) {
+                return res.status(403).json({
+                  status: 403,
+                  message: `You are no owner of meal with id = ${mealId}`,
+                });
+              }
+
+              // Use the connection
+              connection.query(
+                "DELETE FROM meal WHERE id = ?",
+                [mealId],
+                function (error, results, fields) {
+                  // When done with the connection, release it.
+                  connection.release();
+
+                  // Handle error after the release.
+                  if (error) next(error);
+
+                  // Don't use the connection here, it has been returned to the pool.
+                  logger.debug("#results = ", results.length);
+                  logger.debug("#results = ", results);
+                  res.status(200).json({
+                    statusCode: 200,
+                    results: `Meal with id ${mealId} is successfully deleted`,
+                  });
+                }
+              );
+            });
+          } else {
+            res.status(400).json({
+              statusCode: 400,
+              results: `Meal with ID ${mealId} not found`,
+            });
+          }
+        }
+      );
+    });
+  },
 };
-
-// UC-304 Get single meal details
-
-// UC-305 Delete a meal
