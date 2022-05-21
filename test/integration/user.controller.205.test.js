@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //warn
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -148,8 +148,6 @@ describe("UC-205-1/3/4 Change user /api/user/:userId", () => {
         phoneNumber: "0612345678",
       })
       .end((err, res) => {
-        logger.error("res.body");
-        logger.error(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
         res.status.should.eql(400);
@@ -260,7 +258,6 @@ describe("UC-205-6 Change user /api/user/:userId", () => {
       })
       .end((err, res) => {
         let { status, result } = res.body;
-        logger.error("HELLOWWWWWWW");
         logger.info(res.body);
         res.should.have.status(200);
         res.body.results.should.be.a("object").that.eql({

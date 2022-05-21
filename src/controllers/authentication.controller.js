@@ -11,7 +11,6 @@ module.exports = {
   login(req, res, next) {
     dbconnection.getConnection((err, connection) => {
       if (err) {
-        logger.error("Error getting connection from dbconnection");
         res.status(500).json({
           error: err.toString(),
           datetime: new Date().toISOString(),
@@ -26,7 +25,6 @@ module.exports = {
           (err, rows, fields) => {
             connection.release();
             if (err) {
-              logger.error("Error: ", err.toString());
               res.status(500).json({
                 error: err.toString(),
                 datetime: new Date().toISOString(),
@@ -108,7 +106,7 @@ module.exports = {
     // The headers should contain the authorization-field with value 'Bearer [token]'
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      logger.warn("Authorization header missing!");
+      // logger.warn("Authorization header missing!");
       res.status(401).json({
         error: "Authorization header missing!",
         datetime: new Date().toISOString(),
@@ -119,7 +117,7 @@ module.exports = {
 
       jwt.verify(token, jwtSecretKey, (err, payload) => {
         if (err) {
-          logger.warn("Not authorized");
+          // logger.warn("Not authorized");
           res.status(401).json({
             error: "Not authorized",
             datetime: new Date().toISOString(),

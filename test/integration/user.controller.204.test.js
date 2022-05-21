@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //warn
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -94,8 +94,6 @@ describe("UC-204 * User details /api/user/:userId", () => {
       .set("authorization", "Bearer " + jwt.sign({ id: 3 }, jwtSecretKey))
       .end((err, res) => {
         let { status, result } = res.body;
-        logger.error("************error");
-        logger.error(res.body);
         res.should.have.status(404);
         res.body.message.should.be
           .a("string")

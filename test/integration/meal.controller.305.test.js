@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //warn
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -53,7 +53,7 @@ describe("UC-305-3", () => {
 
       // Use the connection
       connection.query(
-        CLEAR_DB + INSERT_USER + INSERT_SECONDUSER,
+        CLEAR_DB + INSERT_USER + INSERT_MEALS + INSERT_SECONDUSER,
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();
@@ -70,27 +70,26 @@ describe("UC-305-3", () => {
     chai
       .request(server)
       .post("/api/auth/login")
-      .send({ emailAdress: "name@server.nl", password: "secret" })
+      .send({ emailAdress: "namesecond@server.nl", password: "secret" })
       .end((err, res) => {
         logger.info(res.body);
       });
   });
 
-  //IMPLEMENTATION
   it("TC-305-3 Actor is no owner, return 403 response", (done) => {
     chai
       .request(server)
-      .delete("/api/user/2")
-      .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+      .delete("/api/meal/1")
+      .set("authorization", "Bearer " + jwt.sign({ id: 2 }, jwtSecretKey))
       .end((err, res) => {
-        logger.info("206-4 res.body: ");
+        logger.info("res.body: ");
         logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
         res.should.have.status(403);
         res.body.message.should.be
           .a("string")
-          .that.equals(`You are no owner of user with id = 2`);
+          .that.equals(`You are no owner of meal with id = 1`);
         done();
       });
   });
@@ -105,7 +104,7 @@ describe("UC-305-2/4/5", () => {
 
       // Use the connection
       connection.query(
-        CLEAR_DB + INSERT_USER + INSERT_SECONDUSER,
+        CLEAR_DB + INSERT_USER + INSERT_MEALS,
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();
@@ -128,11 +127,10 @@ describe("UC-305-2/4/5", () => {
       });
   });
 
-  //IMPLEMENTATION
   it("TC-305-1 Not logged in, return 401 response", (done) => {
     chai
       .request(server)
-      .delete("/api/user/3")
+      .delete("/api/meal/3")
       .set("authorization", "Bearer " + "thisisatoken")
       .end((err, res) => {
         logger.debug(res.body);
@@ -144,40 +142,38 @@ describe("UC-305-2/4/5", () => {
       });
   });
 
-  //IMPLEMENTATION
   it("TC-305-4 Meal doesn't exist, return 404 response", (done) => {
     chai
       .request(server)
-      .delete("/api/user/3")
+      .delete("/api/meal/3")
       .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
       .end((err, res) => {
-        logger.info("206-4 res.body: ");
+        logger.info("res.body: ");
         logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
         res.should.have.status(400);
         res.body.results.should.be
           .a("string")
-          .that.equals("User with ID 3 not found");
+          .that.equals("Meal with ID 3 not found");
         done();
       });
   });
 
-  //IMPLEMENTATION
   it("TC-305-5 Meal successfully deleted, return 200 response", (done) => {
     chai
       .request(server)
-      .delete("/api/user/1")
+      .delete("/api/meal/1")
       .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
       .end((err, res) => {
-        logger.info("206-4 res.body: ");
+        logger.info("res.body: ");
         logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
         res.should.have.status(200);
         res.body.results.should.be
           .a("string")
-          .that.eql("User with id 1 is successfully deleted");
+          .that.eql("Meal with id 1 is successfully deleted");
         done();
       });
   });

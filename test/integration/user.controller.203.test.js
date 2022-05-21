@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //warn
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -97,7 +97,6 @@ describe("UC-203 * Request userprofile /api/user/profile", () => {
         let { status, result } = res.body;
         res.should.have.status(200);
         res.body.results.should.be.a("object");
-        logger.error("**************res.body = " + res.body);
         logger.info(res.body);
         res.body.results.should.eql({
           id: 1,

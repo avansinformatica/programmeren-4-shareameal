@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //warn
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -75,16 +75,14 @@ describe("UC-204 * User details /api/user/:userId", () => {
   it("TC-304-1 Meal doesn't exist, return 404 response", (done) => {
     chai
       .request(server)
-      .get("/api/user/3")
+      .get("/api/meal/3")
       .set("authorization", "Bearer " + jwt.sign({ id: 3 }, jwtSecretKey))
       .end((err, res) => {
         let { status, result } = res.body;
-        logger.error("************error");
-        logger.error(res.body);
         res.should.have.status(404);
         res.body.message.should.be
           .a("string")
-          .that.equals("User with ID 3 not found");
+          .that.equals("Meal with ID 3 not found");
         done();
       });
   });
@@ -93,25 +91,56 @@ describe("UC-204 * User details /api/user/:userId", () => {
   it("TC-304-2 Meal exists, return 200 response", (done) => {
     chai
       .request(server)
-      .get("/api/user/1")
+      .get("/api/meal/1")
       .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
       .end((err, res) => {
         let { status, result } = res.body;
         res.should.have.status(200);
-        res.body.results.should.be.a("array").that.eql([
-          {
-            id: 1,
-            firstName: "first",
-            lastName: "last",
-            isActive: 1,
-            emailAdress: "name@server.nl",
-            password: "secret",
-            phoneNumber: "-",
-            roles: "editor,guest",
-            street: "street",
-            city: "city",
-          },
-        ]);
+        res.body.results.should.be.a("array");
+        res.body.results[0].should.have
+          .property("id")
+          .and.to.be.a("number")
+          .that.equals(1);
+        res.body.results[0].should.have
+          .property("isActive")
+          .and.to.be.a("number")
+          .that.equals(0);
+        res.body.results[0].should.have
+          .property("isVega")
+          .and.to.be.a("number")
+          .that.equals(0);
+        res.body.results[0].should.have
+          .property("isVegan")
+          .and.to.be.a("number")
+          .that.equals(0);
+        res.body.results[0].should.have
+          .property("isToTakeHome")
+          .and.to.be.a("number")
+          .that.equals(1);
+        res.body.results[0].should.have
+          .property("maxAmountOfParticipants")
+          .and.to.be.a("number")
+          .that.equals(5);
+        res.body.results[0].should.have
+          .property("price")
+          .and.to.be.a("string")
+          .that.equals("6.50");
+        res.body.results[0].should.have
+          .property("imageUrl")
+          .and.to.be.a("string")
+          .that.equals("image url");
+        res.body.results[0].should.have
+          .property("cookId")
+          .and.to.be.a("number")
+          .that.equals(1);
+        res.body.results[0].should.have
+          .property("name")
+          .and.to.be.a("string")
+          .that.equals("Meal A");
+        res.body.results[0].should.have
+          .property("description")
+          .and.to.be.a("string")
+          .that.equals("description");
         done();
       });
   });

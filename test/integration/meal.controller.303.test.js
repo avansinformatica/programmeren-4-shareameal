@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //warn
+process.env.LOGLEVEL = "warn"; //warn
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -73,17 +73,13 @@ describe("UC-303", () => {
       .send({ emailAdress: "name@server.nl", password: "secret" })
       .end((err, res) => {
         logger.info(res.body);
-        if (token) {
-          logger.info("token is received");
-        }
       });
   });
 
-  //IMPLEMENTATION
-  it.only("TC-303-1 Toon lijst met Meals", (done) => {
+  it("TC-303 Toon lijst met Meals", (done) => {
     chai
       .request(server)
-      .get("/api/user")
+      .get("/api/meal")
       .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
       .end((err, res) => {
         logger.info("res.body = " + res.body);
@@ -92,22 +88,96 @@ describe("UC-303", () => {
         let { status, result } = res.body;
         res.should.have.status(200);
         res.body.results.should.be.a("array");
-        logger.info("#######res.body.results");
-        logger.info(res.body.results);
-        res.body.results.should.be.eql([
-          {
-            id: 1,
-            firstName: "first",
-            lastName: "last",
-            isActive: 1,
-            emailAdress: "name@server.nl",
-            password: "secret",
-            phoneNumber: "-",
-            roles: "editor,guest",
-            street: "street",
-            city: "city",
-          },
-        ]);
+        var firstItem = res.body.results[0];
+        firstItem.should.have
+          .property("id")
+          .and.to.be.a("number")
+          .that.equals(1);
+        firstItem.should.have
+          .property("isActive")
+          .and.to.be.a("number")
+          .that.equals(0);
+        firstItem.should.have
+          .property("isVega")
+          .and.to.be.a("number")
+          .that.equals(0);
+        firstItem.should.have
+          .property("isVegan")
+          .and.to.be.a("number")
+          .that.equals(0);
+        firstItem.should.have
+          .property("isToTakeHome")
+          .and.to.be.a("number")
+          .that.equals(1);
+        firstItem.should.have
+          .property("maxAmountOfParticipants")
+          .and.to.be.a("number")
+          .that.equals(5);
+        firstItem.should.have
+          .property("price")
+          .and.to.be.a("string")
+          .that.equals("6.50");
+        firstItem.should.have
+          .property("imageUrl")
+          .and.to.be.a("string")
+          .that.equals("image url");
+        firstItem.should.have
+          .property("cookId")
+          .and.to.be.a("number")
+          .that.equals(1);
+        firstItem.should.have
+          .property("name")
+          .and.to.be.a("string")
+          .that.equals("Meal A");
+        firstItem.should.have
+          .property("description")
+          .and.to.be.a("string")
+          .that.equals("description");
+        var secondItem = res.body.results[1];
+        secondItem.should.have
+          .property("id")
+          .and.to.be.a("number")
+          .that.equals(2);
+        secondItem.should.have
+          .property("isActive")
+          .and.to.be.a("number")
+          .that.equals(0);
+        secondItem.should.have
+          .property("isVega")
+          .and.to.be.a("number")
+          .that.equals(0);
+        secondItem.should.have
+          .property("isVegan")
+          .and.to.be.a("number")
+          .that.equals(0);
+        secondItem.should.have
+          .property("isToTakeHome")
+          .and.to.be.a("number")
+          .that.equals(1);
+        secondItem.should.have
+          .property("maxAmountOfParticipants")
+          .and.to.be.a("number")
+          .that.equals(5);
+        secondItem.should.have
+          .property("price")
+          .and.to.be.a("string")
+          .that.equals("6.50");
+        secondItem.should.have
+          .property("imageUrl")
+          .and.to.be.a("string")
+          .that.equals("image url");
+        secondItem.should.have
+          .property("cookId")
+          .and.to.be.a("number")
+          .that.equals(1);
+        secondItem.should.have
+          .property("name")
+          .and.to.be.a("string")
+          .that.equals("Meal B");
+        secondItem.should.have
+          .property("description")
+          .and.to.be.a("string")
+          .that.equals("description");
         done();
       });
   });

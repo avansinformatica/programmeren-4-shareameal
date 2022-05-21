@@ -123,8 +123,8 @@ module.exports = {
 
             logger.info("#results: ", results.length);
 
-            res.status(201).json({
-              statusCode: 201,
+            res.status(200).json({
+              statusCode: 200,
               results: results,
             });
           }
@@ -173,7 +173,10 @@ module.exports = {
   deleteSingleMeal: (req, res) => {
     logger.debug("delteSingleMeal aangeroepen");
 
+    logger.info("req.userId = ***");
+    logger.info(req.userId);
     const mealId = req.params.mealId;
+    const cookId = req.userId;
     logger.debug(`Meal met ID ${mealId} wordt gezocht`);
 
     dbconnection.getConnection(function (err, connection) {
@@ -181,8 +184,7 @@ module.exports = {
 
       // Use the connection
       connection.query(
-        "SELECT * FROM meal WHERE id = ?",
-        [mealId],
+        `SELECT * FROM meal WHERE id = ${req.params.mealId};`,
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();

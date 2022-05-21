@@ -1,5 +1,5 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || "share-a-meal";
-process.env.LOGLEVEL = "debug"; //debug
+process.env.LOGLEVEL = "warn"; //debug
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -49,7 +49,7 @@ describe("UC-301 add meal", () => {
       if (err) next(err); // not connected
 
       connection.query(
-        CLEAR_DB + INSERT_USER + INSERT_MEALS,
+        CLEAR_DB + INSERT_USER,
         function (error, results, fields) {
           connection.release();
           if (error) next(err);
@@ -58,9 +58,16 @@ describe("UC-301 add meal", () => {
         }
       );
     });
+
+    chai
+      .request(server)
+      .post("/api/auth/login")
+      .send({ emailAdress: "name@server.nl", password: "secret" })
+      .end((err, res) => {
+        logger.info(res.body);
+      });
   });
 
-  //IMPLEMENTATION
   it("TC-301-1 Verplicht veld ontbreekt, return 400", (done) => {
     chai
       .request(server)
@@ -91,11 +98,7 @@ describe("UC-301 add meal", () => {
       });
   });
 
-  //IMPLEMENTATION
   it("TC-301-2 Not logged in, return 401 response", (done) => {
-    logger.error(
-      "HELP MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
-    );
     chai
       .request(server)
       .post("/api/meal")
@@ -123,7 +126,6 @@ describe("UC-301 add meal", () => {
       });
   });
 
-  //IMPLEMENTATION
   it("TC-301-3 Meal successfully added, return 200", (done) => {
     chai
       .request(server)
@@ -136,7 +138,7 @@ describe("UC-301 add meal", () => {
         isVega: true,
         isVegan: true,
         isToTakeHome: true,
-        dateTime: "2022-05-20T08:30:53.232Z",
+        dateTime: "2023-05-20T08:30:53.232Z",
         imageUrl:
           "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
         maxAmountOfParticipants: 6,
@@ -146,28 +148,54 @@ describe("UC-301 add meal", () => {
         logger.info(res.body);
         res.should.be.an("object");
         let { status, result } = res.body;
-        res.should.have.status(200);
-        res.body.results.should.be.a("object").that.equals({
-          statusCode: 201,
-          results: {
-            id: 1,
-            isActive: 0,
-            isVega: 0,
-            isVegan: 0,
-            isToTakeHome: 1,
-            dateTime: "2022-05-20T06:30:53.000Z",
-            maxAmountOfParticipants: 6,
-            price: "6.75",
-            imageUrl:
-              "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-            cookId: 165,
-            createDate: "2022-05-20T19:41:53.325Z",
-            updateDate: "2022-05-20T19:41:53.325Z",
-            name: "Spaghetti Bolognese",
-            description: "Dé pastaklassieker bij uitstek.",
-            allergenes: "",
-          },
-        });
+        res.should.have.status(201);
+        var firstItem = res.body.results[0];
+        res.body.results.should.have
+          .property("id")
+          .and.to.be.a("number")
+          .that.equals(1);
+        res.body.results.should.have
+          .property("isActive")
+          .and.to.be.a("number")
+          .that.equals(0);
+        res.body.results.should.have
+          .property("isVega")
+          .and.to.be.a("number")
+          .that.equals(0);
+        res.body.results.should.have
+          .property("isVegan")
+          .and.to.be.a("number")
+          .that.equals(0);
+        res.body.results.should.have
+          .property("isToTakeHome")
+          .and.to.be.a("number")
+          .that.equals(1);
+        res.body.results.should.have
+          .property("maxAmountOfParticipants")
+          .and.to.be.a("number")
+          .that.equals(6);
+        res.body.results.should.have
+          .property("price")
+          .and.to.be.a("string")
+          .that.equals("6.75");
+        res.body.results.should.have
+          .property("imageUrl")
+          .and.to.be.a("string")
+          .that.equals(
+            "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg"
+          );
+        res.body.results.should.have
+          .property("cookId")
+          .and.to.be.a("number")
+          .that.equals(1);
+        res.body.results.should.have
+          .property("name")
+          .and.to.be.a("string")
+          .that.equals("Spaghetti Bolognese");
+        res.body.results.should.have
+          .property("description")
+          .and.to.be.a("string")
+          .that.equals("Dé pastaklassieker bij uitstek.");
         done();
       });
   });
